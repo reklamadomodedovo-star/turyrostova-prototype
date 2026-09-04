@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ростов-Елена-Тур — персональный подбор путешествий, поиск туров и поддержка эксперта.">
+  <meta name="theme-color" content="#092f33">
+  <title>Ростов-Елена-Тур — путешествие, которое подходит именно вам</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Prata&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"TravelAgency","name":"Ростов-Елена-Тур","telephone":"+7-863-221-05-21","email":"rostovelenatur@yandex.ru","address":{"@type":"PostalAddress","addressLocality":"Ростов-на-Дону","streetAddress":"ул. Лермонтовская, 125","addressCountry":"RU"},"url":"https://turyrostova.ru/"}
+  </script>
+</head>
+<body>
+  <div class="prototype-note"><span></span> Демонстрационный прототип нового сайта</div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="Ростов-Елена-Тур — главная">
+      <span class="brand-mark">РЕТ</span>
+      <span class="brand-copy"><b>Ростов-Елена-Тур</b><small>путешествия с заботой</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Основная навигация">
+      <a href="#search">Найти тур</a>
+      <a href="#offers">Горящие туры</a>
+      <a href="#ai">Подбор с ИИ</a>
+      <a href="#about">О нас</a>
+      <a href="#reviews">Отзывы</a>
+    </nav>
+    <div class="header-actions">
+      <a class="phone" href="tel:+78632210521">+7 (863) 221-05-21</a>
+      <button class="button button-small button-dark" data-lead="Перезвонить мне">Перезвонить</button>
+    </div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню" aria-expanded="false"><i></i><i></i></button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-media" aria-hidden="true">
+        <img src="https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&cs=tinysrgb&w=1800" alt="">
+        <div class="hero-gradient"></div>
+      </div>
+      <div class="hero-content reveal">
+        <div class="eyebrow"><span>26 лет рядом с туристами</span><span>Ростов-на-Дону</span></div>
+        <h1>Отпуск, который<br><em>подходит именно вам</em></h1>
+        <p>Найдём лучший вариант, честно сравним отели и останемся на связи до вашего возвращения домой.</p>
+      </div>
+      <div class="weather-card reveal delay-2">
+        <span class="weather-icon">☀</span><div><small>Анталья сейчас</small><strong>+29° · море +27°</strong></div>
+      </div>
+      <a class="scroll-cue" href="#search"><span>Искать тур</span><i>↓</i></a>
+    </section>
+
+    <section class="search-wrap" id="search">
+      <div class="search-card reveal">
+        <div class="search-topline">
+          <div>
+            <span class="section-kicker">Поиск путешествия</span>
+            <h2>Куда отправимся?</h2>
+          </div>
+          <button class="ai-inline" id="openAiTop"><span class="spark">✦</span><span><b>Не знаете, куда?</b><small>Подберём вместе с ИИ</small></span><i>→</i></button>
+        </div>
+        <form class="search-form" id="tourSearch">
+          <label><span>Откуда</span><select id="departure"><option>Ростов-на-Дону</option><option>Москва</option><option>Сочи</option><option>Минеральные Воды</option></select></label>
+          <label><span>Куда</span><select id="destination"><option>Турция</option><option>Египет</option><option>ОАЭ</option><option>Россия</option><option>Куда угодно</option></select></label>
+          <label><span>Когда</span><input id="tourDate" type="date" aria-label="Дата вылета"></label>
+          <label><span>Ночей</span><select id="nights"><option>7–9 ночей</option><option>10–12 ночей</option><option>13–15 ночей</option></select></label>
+          <label><span>Туристы</span><select id="tourists"><option>2 взрослых</option><option>2 взрослых, 1 ребёнок</option><option>1 взрослый</option><option>Свой состав</option></select></label>
+          <button class="button button-search" type="submit"><span>Найти туры</span><i>→</i></button>
+        </form>
+        <div class="search-foot"><span><i></i> Более 500 000 предложений от туроператоров</span><small>Демонстрационная версия поиска</small></div>
+      </div>
+    </section>
+
+    <section class="stats section-pad reveal">
+      <div><strong>26</strong><span>лет создаём<br>путешествия</span></div>
+      <div><strong>12 000+</strong><span>туристов уже<br>отдохнули с нами</span></div>
+      <div><strong>24/7</strong><span>на связи во время<br>вашего путешествия</span></div>
+      <div><strong>4,9</strong><span>средняя оценка<br>по отзывам</span></div>
+    </section>
+
+    <section class="offers section-pad" id="offers">
+      <div class="section-head reveal">
+        <div><span class="section-kicker">Выбор редакции</span><h2>Идеи, с которых можно<br><em>начать путешествие</em></h2></div>
+        <div class="section-actions"><button class="round-arrow" id="cardPrev" aria-label="Назад">←</button><button class="round-arrow" id="cardNext" aria-label="Вперёд">→</button></div>
+      </div>
+      <div class="offer-grid" id="offerGrid">
+        <article class="tour-card reveal">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Бирюзовое море у побережья Турции"><span class="tag hot">Горящий</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Турция · Сиде</span><span>8 ночей</span></div><h3>Crystal Sunset Luxury Resort</h3><div class="rating"><b>4,8</b><span>Превосходно · 386 отзывов</span></div><div class="tour-details"><span>Всё включено</span><span>Вылет из Москвы</span></div><div class="tour-price"><div><small>за двоих</small><strong>от 168 900 ₽</strong></div><button class="button button-outline" data-tour="Crystal Sunset Luxury Resort">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal delay-1">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Семейный отдых на пляже"><span class="tag family">С детьми</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Египет · Макади-Бей</span><span>9 ночей</span></div><h3>Serenity Alma Heights</h3><div class="rating"><b>4,7</b><span>Отлично · 214 отзывов</span></div><div class="tour-details"><span>Всё включено</span><span>Аквапарк</span></div><div class="tour-price"><div><small>за семью</small><strong>от 214 500 ₽</strong></div><button class="button button-outline" data-tour="Serenity Alma Heights">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal delay-2">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Круизный лайнер у европейского побережья"><span class="tag cruise">Круиз</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Средиземноморье</span><span>7 ночей</span></div><h3>Италия, Франция и Испания</h3><div class="rating"><b>4,9</b><span>Выбор эксперта</span></div><div class="tour-details"><span>Полный пансион</span><span>6 городов</span></div><div class="tour-price"><div><small>за человека</small><strong>от 139 800 ₽</strong></div><button class="button button-outline" data-tour="Круиз: Италия, Франция и Испания">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="Пляжный отдых в Объединённых Арабских Эмиратах"><span class="tag family">Новинка</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>ОАЭ · Рас-эль-Хайма</span><span>7 ночей</span></div><h3>Rixos Bab Al Bahr</h3><div class="rating"><b>4,8</b><span>Превосходно · 529 отзывов</span></div><div class="tour-details"><span>Ультра всё включено</span><span>Первая линия</span></div><div class="tour-price"><div><small>за двоих</small><strong>от 189 600 ₽</strong></div><button class="button button-outline" data-tour="Rixos Bab Al Bahr">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal delay-1">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="Морское побережье Таиланда"><span class="tag hot">−18%</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Таиланд · Пхукет</span><span>11 ночей</span></div><h3>Pullman Phuket Karon Beach</h3><div class="rating"><b>4,7</b><span>Отлично · 418 отзывов</span></div><div class="tour-details"><span>Завтраки</span><span>Тропический сад</span></div><div class="tour-price"><div><small>за двоих</small><strong>от 246 300 ₽</strong></div><button class="button button-outline" data-tour="Pullman Phuket Karon Beach">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal delay-2">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="Путешествие по Стамбулу"><span class="tag cruise">Сити-тур</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Турция · Стамбул</span><span>5 ночей</span></div><h3>Radisson Blu Pera</h3><div class="rating"><b>4,6</b><span>Отлично · 307 отзывов</span></div><div class="tour-details"><span>Завтраки</span><span>Центр города</span></div><div class="tour-price"><div><small>за двоих</small><strong>от 124 900 ₽</strong></div><button class="button button-outline" data-tour="Radisson Blu Pera">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="Горный отдых в Красной Поляне"><span class="tag family">Россия</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Россия · Красная Поляна</span><span>6 ночей</span></div><h3>Marriott Sochi Krasnaya Polyana</h3><div class="rating"><b>4,9</b><span>Выбор гостей · 691 отзыв</span></div><div class="tour-details"><span>Завтраки</span><span>Спа и бассейн</span></div><div class="tour-price"><div><small>за двоих</small><strong>от 96 400 ₽</strong></div><button class="button button-outline" data-tour="Marriott Sochi Krasnaya Polyana">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal delay-1">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="Семейный отдых на Кипре"><span class="tag hot">Горящий</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Кипр · Пафос</span><span>8 ночей</span></div><h3>Louis Phaethon Beach</h3><div class="rating"><b>4,7</b><span>Отлично · 344 отзыва</span></div><div class="tour-details"><span>Всё включено</span><span>Для семей</span></div><div class="tour-price"><div><small>за семью</small><strong>от 218 700 ₽</strong></div><button class="button button-outline" data-tour="Louis Phaethon Beach">Подробнее</button></div></div>
+        </article>
+        <article class="tour-card reveal delay-2">
+          <div class="tour-image"><img src="https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" alt="Бирюзовое море на Мальдивах"><span class="tag cruise">Премиум</span><button class="heart" aria-label="Добавить в избранное">♡</button></div>
+          <div class="tour-body"><div class="tour-meta"><span>Мальдивы · Южный Мале</span><span>9 ночей</span></div><h3>Sun Siyam Olhuveli</h3><div class="rating"><b>4,9</b><span>Превосходно · 812 отзывов</span></div><div class="tour-details"><span>Полупансион</span><span>Вилла у океана</span></div><div class="tour-price"><div><small>за двоих</small><strong>от 338 500 ₽</strong></div><button class="button button-outline" data-tour="Sun Siyam Olhuveli">Подробнее</button></div></div>
+        </article>
+      </div>
+      <p class="demo-caption">Цены и предложения показаны для демонстрации интерфейса и не являются публичной офертой.</p>
+    </section>
+
+    <section class="ai-section section-pad" id="ai">
+      <div class="ai-visual reveal">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="ai-orb"><span>✦</span><b>РЕТ AI</b><small>знает, какой отдых<br>подойдёт именно вам</small></div>
+        <span class="floating-chip chip-one">Песчаный пляж</span><span class="floating-chip chip-two">До 250 000 ₽</span><span class="floating-chip chip-three">С ребёнком 6 лет</span>
+      </div>
+      <div class="ai-copy reveal delay-1">
+        <span class="section-kicker light">Ваш личный турагент 24/7</span>
+        <h2>Расскажите о мечте.<br><em>ИИ соберёт путешествие.</em></h2>
+        <p>Не нужно разбираться в сотнях отелей. Ответьте на несколько простых вопросов — помощник поймёт ваши пожелания, сравнит варианты и объяснит разницу.</p>
+        <div class="ai-prompts"><button class="prompt-chip">«Хотим на море с ребёнком»</button><button class="prompt-chip">«Куда улететь до 180 000 ₽?»</button><button class="prompt-chip">«Нужен тихий отель без детей»</button></div>
+        <button class="button button-coral" id="startAi"><span>Начать подбор с ИИ</span><i>✦</i></button>
+        <small class="ai-human">В любой момент можно позвать живого менеджера</small>
+      </div>
+    </section>
+
+    <section class="directions section-pad">
+      <div class="section-head reveal"><div><span class="section-kicker">Выберите настроение</span><h2>Как вы хотите<br><em>провести этот отпуск?</em></h2></div></div>
+      <div class="mood-grid reveal">
+        <button class="mood-card active" data-mood="Море и солнце"><span>01</span><b>Море и солнце</b><small>Пляжи, тепло и полная перезагрузка</small><i>↗</i></button>
+        <button class="mood-card" data-mood="С детьми"><span>02</span><b>С детьми</b><small>Семейные отели, аквапарки и удобный перелёт</small><i>↗</i></button>
+        <button class="mood-card" data-mood="Круизы"><span>03</span><b>Круизы</b><small>Несколько стран за одно путешествие</small><i>↗</i></button>
+        <button class="mood-card" data-mood="Россия"><span>04</span><b>Открыть Россию</b><small>Карелия, Кавказ, Алтай и экскурсионные маршруты</small><i>↗</i></button>
+      </div>
+    </section>
+
+    <section class="about section-pad" id="about">
+      <div class="about-intro reveal"><span class="section-kicker">Почему нам доверяют</span><h2>Мы не продаём туры.<br><em>Мы отвечаем за ваш отдых.</em></h2></div>
+      <div class="about-grid">
+        <article class="about-main reveal"><span class="big-number">24/7</span><h3>Не оставляем один на один с проблемой</h3><p>От бронирования до возвращения домой ваш менеджер остаётся на связи и помогает в любой ситуации.</p><button class="text-link" data-lead="Познакомиться с менеджером">Познакомиться с командой <i>→</i></button></article>
+        <article class="benefit reveal delay-1"><span class="benefit-icon">◇</span><h3>Помним ваши предпочтения</h3><p>Сохраняем историю путешествий и с каждым разом подбираем точнее.</p></article>
+        <article class="benefit reveal delay-2"><span class="benefit-icon">✓</span><h3>Говорим честно</h3><p>Расскажем не только о плюсах отеля, но и о нюансах, которые важно знать.</p></article>
+      </div>
+    </section>
+
+    <section class="reviews section-pad" id="reviews">
+      <div class="review-card reveal">
+        <div class="quote-mark">“</div>
+        <blockquote>К каждому из нас индивидуальный подход. Девочки на связи 24/7 от момента бронирования до возвращения, перед поездкой всегда напомнят, что необходимо взять с собой.</blockquote>
+        <div class="review-author"><span>ЕТ</span><div><b>Елена Т.</b><small>Отдых в Турции · Яндекс</small></div><strong>5,0 ★</strong></div>
+      </div>
+      <div class="review-copy reveal delay-1"><span class="section-kicker">Отзывы туристов</span><h2>Лучше всего о нас<br><em>говорят путешествия</em></h2><p>Настоящие истории клиентов — о выборе отеля, поддержке и тех моментах, ради которых хочется снова собирать чемодан.</p><a class="button button-dark" href="https://yandex.ru" target="_blank" rel="noopener">Читать все отзывы <i>→</i></a></div>
+    </section>
+
+    <section class="lead-section section-pad">
+      <div class="lead-inner reveal">
+        <span class="section-kicker light">Начнём с простого</span>
+        <h2>Где вы хотите<br><em>проснуться завтра?</em></h2>
+        <p>Оставьте номер — эксперт перезвонит, задаст несколько вопросов и подготовит первую подборку.</p>
+        <form class="quick-form" id="quickForm"><label><span>Ваше имя</span><input required name="name" placeholder="Например, Анна"></label><label><span>Телефон</span><input required name="phone" type="tel" placeholder="+7 (___) ___-__-__"></label><button class="button button-coral" type="submit">Получить подборку <i>→</i></button></form>
+        <small>Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных</small>
+      </div>
+      <div class="telegram-flow reveal delay-2">
+        <div class="tg-head"><span class="tg-logo">➤</span><div><b>Новая заявка #RET-4821</b><small>Ростов-Елена-Тур · только что</small></div></div>
+        <dl><div><dt>Клиент</dt><dd>Анна · +7 928 ••• •• 41</dd></div><div><dt>Запрос</dt><dd>Турция, двое взрослых + ребёнок</dd></div><div><dt>Бюджет</dt><dd>до 250 000 ₽</dd></div><div><dt>Источник</dt><dd>ИИ-подбор · новый сайт</dd></div></dl>
+        <div class="tg-actions"><button>Взять в работу</button><button>Открыть диалог</button></div>
+        <span class="flow-label">Так менеджер получает каждую заявку</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-top"><a class="brand brand-light" href="#top"><span class="brand-mark">РЕТ</span><span class="brand-copy"><b>Ростов-Елена-Тур</b><small>путешествия с заботой</small></span></a><div class="footer-cta"><span>Есть вопрос?</span><button class="button button-coral" data-lead="Задать вопрос">Задать менеджеру</button></div></div>
+    <div class="footer-grid"><div><span>Связаться</span><a href="tel:+78632210521">+7 (863) 221-05-21</a><a href="mailto:rostovelenatur@yandex.ru">rostovelenatur@yandex.ru</a></div><div><span>Адрес</span><p>Ростов-на-Дону<br>ул. Лермонтовская, 125</p></div><div><span>Направления</span><a href="#offers">Горящие туры</a><a href="#ai">Подбор с ИИ</a><a href="#search">Поиск туров</a></div><div><span>Документы</span><a href="#">Политика обработки данных</a><a href="#">Договор</a><a href="#">Способы оплаты</a></div></div>
+    <div class="footer-bottom"><span>© ООО «Ростов-Елена-Тур» · ИНН 6165109025 · РТА 0007787</span><span>Прототип новой digital-платформы</span></div>
+  </footer>
+
+  <button class="ai-fab" id="aiFab" aria-label="Открыть ИИ-консультанта"><span>✦</span><div><b>Подобрать тур</b><small>с помощью ИИ</small></div></button>
+
+  <aside class="ai-drawer" id="aiDrawer" aria-hidden="true">
+    <div class="ai-drawer-head"><div><span class="ai-avatar">✦</span><div><b>Алиса, AI-турагент</b><small><i></i> онлайн · отвечает сразу</small></div></div><button id="closeAi" aria-label="Закрыть">×</button></div>
+    <div class="chat-body" id="chatBody">
+      <div class="chat-message bot"><span>Здравствуйте! Я помогу выбрать путешествие под ваши пожелания. Расскажите, с кем и когда хотите поехать?</span><small>13:04</small></div>
+      <div class="quick-replies"><button>Выгодный тур в Турцию на двоих в сентябре из Ростова</button><button>Семья с ребёнком</button><button>Отдых вдвоём</button></div>
+    </div>
+    <form class="chat-input" id="chatForm"><textarea id="chatText" rows="1" placeholder="Напишите, каким видите отпуск…"></textarea><button type="submit" aria-label="Отправить">↑</button></form>
+    <div class="chat-note">Groq GPT‑OSS 20B · без регистрации · туры и цены тестовые</div>
+  </aside>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+  <div class="modal" id="leadModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+      <button class="modal-close" data-close-modal aria-label="Закрыть">×</button>
+      <div class="modal-content" id="modalContent">
+        <span class="section-kicker">Персональная консультация</span><h2 id="modalTitle">Уточнить детали тура</h2><p>Оставьте контакт — менеджер свяжется с вами и проверит актуальную стоимость.</p>
+        <form id="leadForm"><input type="hidden" id="leadSubject"><label><span>Как вас зовут?</span><input required name="name" placeholder="Ваше имя"></label><label><span>Номер телефона</span><input required name="phone" type="tel" placeholder="+7 (___) ___-__-__"></label><label><span>Как удобнее связаться?</span><select name="channel"><option>Позвонить</option><option>WhatsApp</option><option>Telegram</option><option>MAX</option></select></label><button class="button button-coral" type="submit">Отправить заявку <i>→</i></button><small>Данные защищены и используются только для связи по заявке</small></form>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Full Interactive Tour Detail Modal -->
+  <div class="modal tour-detail-modal" id="tourModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-tour-modal></div>
+    <div class="tour-modal-panel">
+      <button class="modal-close" data-close-tour-modal aria-label="Закрыть">×</button>
+      <div id="tourModalBody">
+        <!-- Dynamically rendered by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><b>Добавлено в избранное</b><span>Тур сохранён для сравнения</span></div>
+  <script src="app.js?v=tour-proposals-v2"></script>
+</body>
+</html>
