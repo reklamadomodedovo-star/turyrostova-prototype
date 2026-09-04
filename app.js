@@ -785,7 +785,8 @@ const aiHistory = [];
 function appendMessage(text, type = 'bot') {
   const m = document.createElement('div');
   m.className = `chat-message ${type}`;
-  const s = document.createElement('span');
+  const s = document.createElement('div');
+  s.className = 'chat-bubble';
   if (typeof text === 'string') s.textContent = text;
   else if (text instanceof HTMLElement) s.appendChild(text);
   const t = document.createElement('small');
@@ -840,11 +841,11 @@ async function sendAiMessage(text) {
   const result = await groqAiReply(text);
 
   pending.classList.remove('thinking');
-  const span = $('span', pending);
-  span.innerHTML = '';
+  const bubble = $('.chat-bubble', pending) || $('span', pending);
+  bubble.innerHTML = '';
 
   const proposalData = result.data || generateSmartTourProposal(text);
-  renderBotProposalMessage(span, proposalData);
+  renderBotProposalMessage(bubble, proposalData);
 
   $('small', pending).textContent = now();
   const chatBody = $('#chatBody');
