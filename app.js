@@ -1,9 +1,22 @@
-// Ростов-Елена-Тур — Главный клиентский скрипт (v3 Professional Tour Proposals)
+// Ростов-Елена-Тур — Главный клиентский скрипт (v6 Smart AI Travel Agent Engine)
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
 
 // Global Tour Registry for interactive modals & shareable links
 window.toursRegistry = {};
+
+// Session Travel Context (remembers preferences across turns)
+window.travelContext = {
+  departureCity: 'Москвы',
+  depCode: 'SVO',
+  adults: 2,
+  children: 0,
+  month: 'ноябре',
+  nights: 10,
+  budget: 0,
+  destKey: 'goa',
+  turnCount: 0
+};
 
 // Default departure date (+14 days)
 const today = new Date();
@@ -158,6 +171,7 @@ const DESTINATIONS_DB = {
     airlineReturn: 'Azur Air (ZF-7712)',
     basePrice: 118000,
     foodDefault: 'Всё включено (All Inclusive)',
+    expertTip: '💡 <b>Совет эксперта:</b> В Южном Гоа широкие песчаные пляжи и уединение (Caravela Beach и Sunrise Resort), а в Северном — больше ресторанчиков и вечерней жизни.',
     photos: PHOTO_BANKS.goa,
     hotels: [
       {
@@ -216,6 +230,128 @@ const DESTINATIONS_DB = {
       }
     ]
   },
+  russia: {
+    keys: /сочи|красн.*полян|роза|дагест|алтай|карели|росси/,
+    country: 'Россия',
+    resort: 'Сочи / Красная Поляна',
+    airportCode: 'AER',
+    airportName: 'Сочи (AER)',
+    flightHours: '3 ч 50 мин',
+    airline: 'Аэрофлот / S7 (SU-1124)',
+    airlineReturn: 'Аэрофлот (SU-1125)',
+    basePrice: 52000,
+    foodDefault: 'Завтраки (Шведский стол)',
+    expertTip: '💡 <b>Совет эксперта:</b> Если хотите спа-релакс в горах — выбирайте Green Flow с подогреваемым открытым бассейном +32°C. Если важны море и прогулки — Sea Galaxy рядом с Дендрарием.',
+    photos: PHOTO_BANKS.russia,
+    hotels: [
+      {
+        name: 'Marriott Sochi Krasnaya Polyana',
+        stars: 5,
+        rating: '4.9',
+        reviewsCount: 691,
+        resort: 'Россия · Красная Поляна (высота 540 м)',
+        beach: 'Горный курорт + трансфер на собственный пляж в Имеретинке',
+        food: 'Завтраки (Шведский стол)',
+        room: 'Deluxe Mountain View (40 м²)',
+        features: [
+          'Открытый подогреваемый бассейн с видом на Кавказские горы',
+          'Роскошный Soul SPA и термальный комплекс',
+          'Канатная дорога в 100 метрах от отеля',
+          'Бесплатный шаттл на морской пляж'
+        ],
+        photos: PHOTO_BANKS.russia,
+        desc: 'Премиальный пятизвездочный отель в сердце курорта Красная Поляна. Открытый круглогодичный подогреваемый бассейн, захватывающий вид на горные вершины.'
+      },
+      {
+        name: 'Green Flow Hotel Rosa Khutor',
+        stars: 4,
+        rating: '4.9',
+        reviewsCount: 750,
+        resort: 'Россия · Роза Хутор (высота 1170 м)',
+        beach: 'Горный спа-отель с открытым инфинити-бассейном',
+        food: 'Завтраки Organic',
+        room: 'Premier Panorama Room (33 м²)',
+        features: [
+          'Знаменитый открытый инфинити-бассейн с подогревом (+32°C)',
+          'Концепция хилинг-отдыха и термальная спа-зона',
+          'Занятия йогой и медитации в горах',
+          'Ски-пасс и трансфер включены'
+        ],
+        photos: PHOTO_BANKS.russia,
+        desc: 'Первый в России отель международной ассоциации Healing Hotels of the World. Знаменитый инфинити-бассейн на высоте 1170 метров и чистейший горный воздух.'
+      },
+      {
+        name: 'Sea Galaxy Hotel Congress & Spa',
+        stars: 4,
+        rating: '4.7',
+        reviewsCount: 480,
+        resort: 'Россия · Сочи, Светлана',
+        beach: '1-я линия (100 м до центральной набережной)',
+        food: 'Завтраки + Ужины (Шведский стол)',
+        room: 'Standard Sea View с балконом (24 м²)',
+        features: [
+          'Панорамный вид на Черное море из всех номеров',
+          'Рядом парк Дендрарий и цирк',
+          'Современный спа-центр и тренажерный зал',
+          'Экскурсия в Олимпийский парк в подарок'
+        ],
+        photos: PHOTO_BANKS.russia,
+        desc: 'Популярный отель в центре Сочи в парковой зоне микрорайона Светлана. 100 метров до моря, отличные завтраки и прекрасный сервис.'
+      }
+    ]
+  },
+  uae: {
+    keys: /оаэ|эмират|дуба|рас-эль-хайм|абу-даби|шардж/,
+    country: 'ОАЭ',
+    resort: 'Дубай / Рас-эль-Хайма',
+    airportCode: 'DXB',
+    airportName: 'Дубай (DXB)',
+    flightHours: '5 ч 30 мин',
+    airline: 'Flydubai (FZ-968)',
+    airlineReturn: 'Flydubai (FZ-969)',
+    basePrice: 96000,
+    foodDefault: 'Ультра всё включено',
+    expertTip: '💡 <b>Совет эксперта:</b> В Рас-эль-Хайме отель Rixos работает по редкой для ОАЭ системе «Ультра всё включено», а в Дубае Rove La Mer идеален для пляжа и шопинга.',
+    photos: PHOTO_BANKS.uae,
+    hotels: [
+      {
+        name: 'Rixos Bab Al Bahr',
+        stars: 5,
+        rating: '4.8',
+        reviewsCount: 529,
+        resort: 'ОАЭ · Рас-эль-Хайма, Марджан',
+        beach: '1-я линия (собственный пляж острова Марджан)',
+        food: 'Ультра всё включено',
+        room: 'Deluxe Room Island View (35 м²)',
+        features: [
+          'Редкая для ОАЭ система «Ультра всё включено»',
+          '8 бассейнов и отдельный инфинити-бассейн',
+          '14 ресторанов и баров мирового уровня',
+          'Пляжные вечеринки и живые концерты'
+        ],
+        photos: PHOTO_BANKS.uae,
+        desc: 'Курорт в форме пирамид на искусственном острове Аль-Марджан. Неограниченное питание и напитки, песчаный пляж и премиальный комфорт.'
+      },
+      {
+        name: 'Rove La Mer Beach',
+        stars: 4,
+        rating: '4.8',
+        reviewsCount: 460,
+        resort: 'ОАЭ · Дубай, Джумейра',
+        beach: '1-я линия (прямой выход на модный пляж Ла Мер)',
+        food: 'Завтраки + Ужины (HB)',
+        room: 'Rover Room Sea View (26 м²)',
+        features: [
+          'Самое стильное побережье Дубая с ресторанами и бутиками',
+          'Бассейн с видом на Персидский залив и Бурдж Халифу',
+          'Бесплатный шаттл до Dubai Mall и метро',
+          'Экскурсия по современному Дубаю в подарок'
+        ],
+        photos: PHOTO_BANKS.uae,
+        desc: 'Ультрамодный дизайнерский отель прямо на песчаном пляже La Mer. Идеальная локация для сочетания пляжного релакса и шопинга в Дубае.'
+      }
+    ]
+  },
   turkey: {
     keys: /турц|антал|алани|сиде|кемер|белек|бодрум|стамбул/,
     country: 'Турция',
@@ -227,6 +363,7 @@ const DESTINATIONS_DB = {
     airlineReturn: 'Turkish Airlines (TK-3913)',
     basePrice: 84000,
     foodDefault: 'Ультра всё включено',
+    expertTip: '💡 <b>Совет эксперта:</b> В Сиде и Белеке широкие песчаные пляжи с пологим заходом для семей, а в Кемере — сосны, горы и чистейшая лазурная вода.',
     photos: PHOTO_BANKS.turkey,
     hotels: [
       {
@@ -278,8 +415,27 @@ const DESTINATIONS_DB = {
     airlineReturn: 'Air Cairo (SM-903)',
     basePrice: 78000,
     foodDefault: 'Всё включено (All Inclusive)',
+    expertTip: '💡 <b>Совет эксперта:</b> В Шарм-эль-Шейхе отель Reef Oasis находится в бухте Рас-Ум-Сид, которая закрыта от ветров и славится сказочным коралловым рифом.',
     photos: PHOTO_BANKS.egypt,
     hotels: [
+      {
+        name: 'Reef Oasis Beach Resort',
+        stars: 5,
+        rating: '4.8',
+        reviewsCount: 512,
+        resort: 'Египет · Шарм-эль-Шейх, Рас Ум Сид',
+        beach: '1-я линия (бухта без ветра, песчаный вход и риф)',
+        food: 'Премиум всё включено',
+        room: 'Sea Breeze Room (38 м²)',
+        features: [
+          'Самая защищенная от зимних ветров бухта Шарм-эль-Шейха',
+          'Один из лучших коралловых рифов Синая',
+          '10 открытых бассейнов и джакузи с видом на море',
+          'Морская экскурсия на остров Тиран в подарок'
+        ],
+        photos: PHOTO_BANKS.egypt,
+        desc: 'Расположен на утесе с фантастическим панорамным видом на Красное море. Уникальный пляж с песчаным заходом и богатейшим рифом.'
+      },
       {
         name: 'Serenity Alma Heights',
         stars: 5,
@@ -300,39 +456,6 @@ const DESTINATIONS_DB = {
       }
     ]
   },
-  uae: {
-    keys: /оаэ|эмират|дуба|рас-эль-хайм|абу-даби|шардж/,
-    country: 'ОАЭ',
-    resort: 'Дубай / Рас-эль-Хайма',
-    airportCode: 'DXB',
-    airportName: 'Дубай (DXB)',
-    flightHours: '5 ч 30 мин',
-    airline: 'Flydubai (FZ-968)',
-    airlineReturn: 'Flydubai (FZ-969)',
-    basePrice: 96000,
-    foodDefault: 'Ультра всё включено',
-    photos: PHOTO_BANKS.uae,
-    hotels: [
-      {
-        name: 'Rixos Bab Al Bahr',
-        stars: 5,
-        rating: '4.8',
-        reviewsCount: 529,
-        resort: 'ОАЭ · Рас-эль-Хайма, Марджан',
-        beach: '1-я линия (собственный пляж острова Марджан)',
-        food: 'Ультра всё включено',
-        room: 'Deluxe Room Island View (35 м²)',
-        features: [
-          'Редкая для ОАЭ система «Ультра всё включено»',
-          '8 бассейнов и отдельный инфинити-бассейн',
-          '14 ресторанов и баров мирового уровня',
-          'Пляжные вечеринки и живые концерты'
-        ],
-        photos: PHOTO_BANKS.uae,
-        desc: 'Курорт в форме пирамид на искусственном острове Аль-Марджан. Неограниченное питание и напитки, песчаный пляж и премиальный комфорт.'
-      }
-    ]
-  },
   maldives: {
     keys: /мальдив|мале|атолл/,
     country: 'Мальдивы',
@@ -344,6 +467,7 @@ const DESTINATIONS_DB = {
     airlineReturn: 'Аэрофлот (SU-321)',
     basePrice: 180000,
     foodDefault: 'Премиум всё включено',
+    expertTip: '💡 <b>Совет эксперта:</b> Sun Siyam Olhuveli расположен всего в 45 минутах на скоростном катере от Мале — без дорогого гидросамолета, с тремя красивейшими островами.',
     photos: PHOTO_BANKS.maldives,
     hotels: [
       {
@@ -377,6 +501,7 @@ const DESTINATIONS_DB = {
     airlineReturn: 'Аэрофлот (SU-275)',
     basePrice: 130000,
     foodDefault: 'Завтраки (Шведский стол)',
+    expertTip: '💡 <b>Совет эксперта:</b> На Пхукете пляж Карон славится своим чистым хрустящим песком и спокойным морем с ноября по апрель.',
     photos: PHOTO_BANKS.thailand,
     hotels: [
       {
@@ -398,242 +523,101 @@ const DESTINATIONS_DB = {
         desc: 'Флагманский отель на лучшем пляже Пхукета с поющим скрипящим песком. Тропический парк, первоклассный сервис и близость к ресторанам.'
       }
     ]
-  },
-  russia: {
-    keys: /росси|сочи|красн.*полян|дагест|алтай|карели/,
-    country: 'Россия',
-    resort: 'Сочи / Красная Поляна',
-    airportCode: 'AER',
-    airportName: 'Сочи (AER)',
-    flightHours: '3 ч 50 мин',
-    airline: 'Аэрофлот / S7 (SU-1124)',
-    airlineReturn: 'Аэрофлот (SU-1125)',
-    basePrice: 52000,
-    foodDefault: 'Завтраки (Шведский стол)',
-    photos: PHOTO_BANKS.russia,
-    hotels: [
-      {
-        name: 'Marriott Sochi Krasnaya Polyana',
-        stars: 5,
-        rating: '4.9',
-        reviewsCount: 691,
-        resort: 'Россия · Красная Поляна',
-        beach: 'Горный курорт + трансфер на собственный пляж в Имеретинке',
-        food: 'Завтраки (Шведский стол)',
-        room: 'Deluxe Mountain View (40 м²)',
-        features: [
-          'Открытый подогреваемый бассейн с видом на Кавказские горы',
-          'Роскошный Soul SPA и термальный комплекс',
-          'Канатная дорога в 100 метрах от отеля',
-          'Бесплатный шаттл на морской пляж'
-        ],
-        photos: PHOTO_BANKS.russia,
-        desc: 'Премиальный пятизвездочный отель в сердце курорта Красная Поляна. Открытый круглогодичный подогреваемый бассейн, захватывающий вид на горные вершины.'
-      }
-    ]
   }
 };
 
-// Robust Parser to convert Groq text into rich TourProposal objects
-function parseAndEnrichGroqText(rawText, userQuery) {
-  const lowerQuery = (userQuery + ' ' + rawText).toLowerCase();
+// Travel Agent Dialogue & Context Manager
+function updateTravelContextAndGenerate(userQuery, isFirstTurn) {
+  const ctx = window.travelContext;
+  ctx.turnCount = isFirstTurn ? 1 : ctx.turnCount + 1;
+  const lower = userQuery.toLowerCase();
 
-  // Find matching destination or default to Goa/Turkey
-  let destKey = Object.keys(DESTINATIONS_DB).find(k => DESTINATIONS_DB[k].keys.test(lowerQuery));
-  if (!destKey) {
-    if (/пляж|мор|океан|ноябр|октябр|декабр|зимой|в тепле/.test(lowerQuery)) destKey = 'goa';
-    else if (/роскош|премиум|лакшери|остров/.test(lowerQuery)) destKey = 'maldives';
-    else if (/недорог|эконом|скидк|выгод/.test(lowerQuery)) destKey = 'turkey';
-    else destKey = 'goa';
-  }
-  const dest = DESTINATIONS_DB[destKey];
-
-  // Detect departure city
-  let depCity = 'Москвы';
-  let depCode = 'SVO';
-  if (/из ростов|вылет.*ростов|ростова/.test(lowerQuery)) { depCity = 'Ростова-на-Дону'; depCode = 'ROV'; }
-  else if (/из соч|вылет.*сочи/.test(lowerQuery)) { depCity = 'Сочи'; depCode = 'AER'; }
-  else if (/мин.*вод|минвод/.test(lowerQuery)) { depCity = 'Минеральных Вод'; depCode = 'MRV'; }
-  else if (/питер|санкт-петербург/.test(lowerQuery)) { depCity = 'Санкт-Петербурга'; depCode = 'LED'; }
-
-  // Detect travelers count
-  let adults = 2;
-  const adultsMatch = lowerQuery.match(/(\d+)\s*(?:взрос|чел|турист)/);
-  if (adultsMatch) adults = parseInt(adultsMatch[1]);
-  else if (/один|1\s*чел|на одного/.test(lowerQuery)) adults = 1;
-  else if (/на троих|3\s*чел/.test(lowerQuery)) adults = 3;
-
-  let children = 0;
-  const childMatch = lowerQuery.match(/(\d+)\s*(?:реб|дет)/);
-  if (childMatch) children = parseInt(childMatch[1]);
-  else if (/с ребён|с ребен|с дет/.test(lowerQuery)) children = 1;
-
-  // Split text into option blocks (by "1.", "2.", "3." or paragraphs)
-  const rawBlocks = rawText.split(/(?:^|\s+)(?:\d+[\.\)]\s+)/).filter(b => b.trim().length > 10);
-  const proposals = [];
-
-  if (rawBlocks.length >= 2) {
-    // Parse each block returned by Groq
-    rawBlocks.forEach((block, idx) => {
-      const hotelMatch = block.match(/(?:отель|комплекс)?\s*[«"“]([^»"”]+)[»"”]/i) ||
-                         block.match(/(?:отель|гостиница)\s+([A-Za-zА-Яа-я0-9\s-]+?)(?:,|\.|\s+\d★|\s+\d\s*зв)/i);
-      const hotelName = hotelMatch ? hotelMatch[1].trim() : (dest.hotels[idx % dest.hotels.length]?.name || `Курортный отель #${idx+1}`);
-
-      const starsMatch = block.match(/(\d)\s*(?:★|звезд|\*)/i);
-      const stars = starsMatch ? parseInt(starsMatch[1]) : (dest.hotels[idx % dest.hotels.length]?.stars || 4);
-
-      const nightsMatch = block.match(/(\d+)\s*(?:ноч|дн|ночей)/i);
-      const nights = nightsMatch ? parseInt(nightsMatch[1]) : (10 + idx * 2);
-
-      const priceMatch = block.match(/(?:цена|стоимость|от|–|-)?\s*(\d[\d\s]{3,})\s*(?:руб|₽)/i);
-      let price = priceMatch ? parseInt(priceMatch[1].replace(/\s/g, '')) : (225000 + idx * 12000);
-      price = Math.round(price / 500) * 500;
-
-      let food = dest.foodDefault;
-      if (/полупансион|завтрак\s*\+\s*ужин/i.test(block)) food = 'Полупансион (Завтрак + Ужин)';
-      else if (/полный пансион/i.test(block)) food = 'Полный пансион (FB)';
-      else if (/всё включено|all inclusive/i.test(block)) food = 'Всё включено (All Inclusive)';
-      else if (/ультра всё включено/i.test(block)) food = 'Ультра всё включено';
-      else if (/завтрак/i.test(block)) food = 'Завтраки (Шведский стол)';
-
-      const dateMatch = block.match(/вылет[а-я\s]*(\d+\s+[а-яё]+)/i);
-      const depDate = dateMatch ? dateMatch[1] : `0${5 + idx * 2} ноября`;
-
-      const perkMatch = block.match(/(?:преимущество|фишка|плюс|бонус)\s*[:–-]\s*([^.]+)/i);
-      const perk = perkMatch ? perkMatch[1].trim() : (dest.hotels[idx % dest.hotels.length]?.features[0] || 'Бесплатный трансфер и экскурсионный пакет');
-
-      const oldPrice = Math.round((price * 1.12) / 500) * 500;
-      const perPerson = Math.round(price / (adults + children));
-      const tourId = `tour-prop-${hotelName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString().slice(-4)}`;
-
-      const photoSet = dest.photos || PHOTO_BANKS.goa;
-
-      const tourObj = {
-        id: tourId,
-        hotelName: hotelName,
-        stars: stars,
-        rating: (4.7 + idx * 0.1).toFixed(1),
-        reviewsCount: 386 + idx * 55,
-        country: dest.country,
-        resort: dest.hotels[idx % dest.hotels.length]?.resort || `${dest.country}, ${dest.resort}`,
-        beach: dest.hotels[idx % dest.hotels.length]?.beach || '1-я линия, песчаный пляж',
-        food: food,
-        room: 'Deluxe Room (38 м²)',
-        departureCity: depCity,
-        departureAirport: depCode,
-        destinationAirport: dest.airportCode,
-        destinationAirportName: dest.airportName,
-        datesText: `${nights} ночей · вылет ${depDate} 2026`,
-        datesShort: `${depDate} (на ${nights} ночей)`,
-        nights: nights,
-        airline: dest.airline,
-        airlineReturn: dest.airlineReturn,
-        flightHours: dest.flightHours,
-        priceTotal: price.toLocaleString('ru-RU') + ' ₽',
-        priceOld: oldPrice.toLocaleString('ru-RU') + ' ₽',
-        pricePerPerson: perPerson.toLocaleString('ru-RU') + ' ₽ / чел.',
-        discount: '-12%',
-        features: [
-          perk,
-          'Прямой чартерный перелёт с багажом 20 кг',
-          'Трансфер аэропорт — отель на минивэне',
-          'Медицинская страховка туриста с покрытием $40 000'
-        ],
-        photos: photoSet,
-        description: dest.hotels[idx % dest.hotels.length]?.desc || `Прекрасный отель ${hotelName} ${stars}★ на побережье. Идеально подходит для комфортного отдыха у моря.`,
-        adults: adults,
-        children: children,
-        publicLink: `https://reklamadomodedovo-star.github.io/turyrostova-prototype/?tour=${tourId}`
-      };
-
-      window.toursRegistry[tourId] = tourObj;
-      proposals.push(tourObj);
-    });
-  } else {
-    // Fallback if raw text didn't contain 2+ numbered blocks
-    return generateSmartTourProposal(userQuery || rawText);
+  // Update Destination if specified
+  let matchedKey = Object.keys(DESTINATIONS_DB).find(k => DESTINATIONS_DB[k].keys.test(lower));
+  if (matchedKey) {
+    ctx.destKey = matchedKey;
   }
 
-  return {
-    destName: `${dest.country} (${dest.resort})`,
-    departureCity: depCity,
-    dates: proposals[0]?.datesShort || 'в ноябре',
-    travelersText: `${adults} взр.${children ? ' + ' + children + ' реб.' : ''}`,
-    proposals: proposals
-  };
-}
+  // Update Departure City if specified
+  if (/из ростов|вылет.*ростов|ростова/.test(lower)) { ctx.departureCity = 'Ростова-на-Дону'; ctx.depCode = 'ROV'; }
+  else if (/из москв|вылет.*москв|москвы/.test(lower)) { ctx.departureCity = 'Москвы'; ctx.depCode = 'SVO'; }
+  else if (/из соч|вылет.*сочи/.test(lower)) { ctx.departureCity = 'Сочи'; ctx.depCode = 'AER'; }
+  else if (/мин.*вод|минвод/.test(lower)) { ctx.departureCity = 'Минеральных Вод'; ctx.depCode = 'MRV'; }
+  else if (/питер|санкт-петербург/.test(lower)) { ctx.departureCity = 'Санкт-Петербурга'; ctx.depCode = 'LED'; }
 
-// Universal Smart Tour Proposal Generator
-function generateSmartTourProposal(queryText) {
-  const lower = queryText.toLowerCase();
+  // Update Travelers Count if specified
+  if (/на троих|3\s*чел/.test(lower)) ctx.adults = 3;
+  else if (/на одного|1\s*чел/.test(lower)) ctx.adults = 1;
+  else if (/на двоих|2\s*взрос|вдвоем|вдвоём/.test(lower)) ctx.adults = 2;
 
-  let destKey = Object.keys(DESTINATIONS_DB).find(k => DESTINATIONS_DB[k].keys.test(lower));
-  if (!destKey) {
-    if (/пляж|мор|океан|ноябр|октябр|декабр|зимой|в тепле/.test(lower)) destKey = 'goa';
-    else if (/роскош|премиум|лакшери|остров/.test(lower)) destKey = 'maldives';
-    else if (/недорог|эконом|скидк|выгод/.test(lower)) destKey = 'turkey';
-    else destKey = 'goa';
+  if (/с дет|с ребен|ребенок|дети/.test(lower)) {
+    const cm = lower.match(/(\d+)\s*(?:реб|дет)/);
+    ctx.children = cm ? parseInt(cm[1]) : 1;
   }
 
-  const dest = DESTINATIONS_DB[destKey];
-
-  let departureCity = 'Москвы';
-  let depCode = 'SVO';
-  if (/из ростов|вылет.*ростов|ростова/.test(lower)) { departureCity = 'Ростова-на-Дону'; depCode = 'ROV'; }
-  else if (/из соч|вылет.*сочи/.test(lower)) { departureCity = 'Сочи'; depCode = 'AER'; }
-  else if (/мин.*вод|минвод/.test(lower)) { departureCity = 'Минеральных Вод'; depCode = 'MRV'; }
-  else if (/питер|санкт-петербург/.test(lower)) { departureCity = 'Санкт-Петербурга'; depCode = 'LED'; }
-
-  let adults = 2;
-  const adultsMatch = lower.match(/(\d+)\s*(?:взрос|чел|турист)/);
-  if (adultsMatch) adults = parseInt(adultsMatch[1]);
-  else if (/один|1\s*чел|на одного/.test(lower)) adults = 1;
-  else if (/на троих|3\s*чел/.test(lower)) adults = 3;
-
-  let children = 0;
-  const childMatch = lower.match(/(\d+)\s*(?:реб|дет)/);
-  if (childMatch) children = parseInt(childMatch[1]);
-  else if (/с ребён|с ребен|с дет/.test(lower)) children = 1;
-
-  let nights = 11;
+  // Update Duration if specified
   const nightsRangeMatch = lower.match(/(\d+)\s*[-–—]\s*(\d+)\s*(?:ноч|дн)/);
   if (nightsRangeMatch) {
-    nights = Math.round((parseInt(nightsRangeMatch[1]) + parseInt(nightsRangeMatch[2])) / 2);
+    ctx.nights = Math.round((parseInt(nightsRangeMatch[1]) + parseInt(nightsRangeMatch[2])) / 2);
   } else {
     const singleNightsMatch = lower.match(/(\d+)\s*(?:ноч|дн)/);
-    if (singleNightsMatch) nights = parseInt(singleNightsMatch[1]);
+    if (singleNightsMatch) ctx.nights = parseInt(singleNightsMatch[1]);
   }
-  if (nights < 5) nights = 7;
-  if (nights > 21) nights = 14;
 
+  // Update Month if specified
   const months = ['январе', 'феврале', 'марте', 'апреле', 'мае', 'июне', 'июле', 'августе', 'сентябре', 'октябре', 'ноябре', 'декабре'];
-  let foundMonth = 'ноябре';
   months.forEach(m => {
-    if (lower.includes(m.slice(0, 4))) foundMonth = m;
+    if (lower.includes(m.slice(0, 4))) ctx.month = m;
   });
 
-  let budget = 0;
+  // Update Budget if specified
   const budgetMatch = lower.match(/(?:до|бюджет\D{0,10})(\d[\d\s]{3,})/);
-  if (budgetMatch) budget = parseInt(budgetMatch[1].replace(/\s/g, ''));
+  if (budgetMatch) ctx.budget = parseInt(budgetMatch[1].replace(/\s/g, ''));
 
+  const dest = DESTINATIONS_DB[ctx.destKey] || DESTINATIONS_DB.goa;
+
+  // Natural Human Travel Agent Intro Speech
+  let agentIntro = '';
+  if (ctx.turnCount <= 1) {
+    agentIntro = `Здравствуйте! С удовольствием помогу подобрать идеальный отпуск. По вашим пожеланиям подготовила проверенные варианты в <b>${dest.country} (${dest.resort})</b> с вылетом из <b>${ctx.departureCity}</b> на ${ctx.adults} взр.${ctx.children ? ' + ' + ctx.children + ' реб.' : ''}:`;
+  } else {
+    // Follow-up transitions
+    if (/сочи|красн.*полян|роза/.test(lower)) {
+      agentIntro = `Отличный выбор! В Сочи в ${ctx.month} потрясающий чистый воздух, а в Красной Поляне работают подогреваемые инфинити-бассейны с видом на Кавказ. Вот лучшие отели для вашего состава (${ctx.adults} взр., вылет из ${ctx.departureCity}):`;
+    } else if (/оаэ|дуба|эмират/.test(lower)) {
+      agentIntro = `В Эмиратах сейчас идеальный сезон: комфортные +27°C и теплое море. Подобрала варианты с отличным питанием и собственным пляжем:`;
+    } else if (/егип|шарм|хургад/.test(lower)) {
+      agentIntro = `Египет — отличный выбор для солнца и теплого моря (+26°C). Выбрала отели в уютных безветренных бухтах с красивейшими рифами:`;
+    } else if (/мальдив/.test(lower)) {
+      agentIntro = `Мальдивы — это абсолютный релакс и бирюзовые лагуны. Подобрала курорты с удобным трансфером на катере и великолепным домашним рифом:`;
+    } else if (/подешев|бюджет|эконом|скидк/.test(lower)) {
+      agentIntro = `Понимаю вас! Оптимизировала бюджет: нашла отели с высоким рейтингом гостей (от 4.7★), где вы не переплачиваете за бренд, но получаете отличный сервис:`;
+    } else if (/дет|семь/.test(lower)) {
+      agentIntro = `Для семейного отдыха на первом месте безопасность пляжа и сервис. Выбрала отели с пологим песчаным заходом в воду, аквапарками и анимацией:`;
+    } else {
+      agentIntro = `С удовольствием! Пересчитала подборку в <b>${dest.country} (${dest.resort})</b> для вашего состава (${ctx.adults} взр., вылет из ${ctx.departureCity}, на ${ctx.nights} ночей):`;
+    }
+  }
+
+  // Generate 2-3 Hotel Proposals
   const proposals = [];
   const hotelsPool = dest.hotels;
 
   hotelsPool.forEach((hotelTemplate, idx) => {
-    const tourId = `tour-prop-${destKey}-${idx + 1}-${Date.now().toString().slice(-4)}`;
+    const tourId = `tour-prop-${ctx.destKey}-${idx + 1}-${Date.now().toString().slice(-4)}`;
     const depDay = 5 + idx * 2;
-    const startDateStr = `${depDay < 10 ? '0' + depDay : depDay} ${foundMonth.slice(0, 3)} 2026`;
-    const endDateStr = `${depDay + nights} ${foundMonth.slice(0, 3)} 2026`;
+    const startDateStr = `${depDay < 10 ? '0' + depDay : depDay} ${ctx.month.slice(0, 3)} 2026`;
+    const endDateStr = `${depDay + ctx.nights} ${ctx.month.slice(0, 3)} 2026`;
 
-    let calculatedPrice = dest.basePrice * (adults + children * 0.65) * (nights / 7) + (idx * 14000);
-    if (budget && calculatedPrice > budget) {
-      calculatedPrice = budget - (idx * 6000);
+    let calculatedPrice = dest.basePrice * (ctx.adults + ctx.children * 0.65) * (ctx.nights / 7) + (idx * 14000);
+    if (ctx.budget && calculatedPrice > ctx.budget) {
+      calculatedPrice = ctx.budget - (idx * 6000);
     }
     calculatedPrice = Math.round(calculatedPrice / 500) * 500;
-    if (calculatedPrice < 68000) calculatedPrice = 68000 + idx * 12000;
+    if (calculatedPrice < 58000) calculatedPrice = 58000 + idx * 10000;
 
     const oldPrice = Math.round((calculatedPrice * 1.12) / 500) * 500;
-    const perPerson = Math.round(calculatedPrice / (adults + children));
+    const perPerson = Math.round(calculatedPrice / (ctx.adults + ctx.children));
 
     const tourObj = {
       id: tourId,
@@ -646,13 +630,13 @@ function generateSmartTourProposal(queryText) {
       beach: hotelTemplate.beach,
       food: hotelTemplate.food,
       room: hotelTemplate.room,
-      departureCity: departureCity,
-      departureAirport: depCode,
+      departureCity: ctx.departureCity,
+      departureAirport: ctx.depCode,
       destinationAirport: dest.airportCode,
       destinationAirportName: dest.airportName,
-      datesText: `${nights} ночей · ${startDateStr} — ${endDateStr}`,
-      datesShort: `${startDateStr} (на ${nights} ночей)`,
-      nights: nights,
+      datesText: `${ctx.nights} ночей · ${startDateStr} — ${endDateStr}`,
+      datesShort: `${startDateStr} (на ${ctx.nights} ночей)`,
+      nights: ctx.nights,
       airline: dest.airline,
       airlineReturn: dest.airlineReturn,
       flightHours: dest.flightHours,
@@ -663,8 +647,8 @@ function generateSmartTourProposal(queryText) {
       features: hotelTemplate.features,
       photos: hotelTemplate.photos || dest.photos,
       description: hotelTemplate.desc,
-      adults: adults,
-      children: children,
+      adults: ctx.adults,
+      children: ctx.children,
       publicLink: `https://reklamadomodedovo-star.github.io/turyrostova-prototype/?tour=${tourId}`
     };
 
@@ -673,27 +657,29 @@ function generateSmartTourProposal(queryText) {
   });
 
   return {
+    agentIntro: agentIntro,
     destName: `${dest.country} (${dest.resort})`,
-    departureCity: departureCity,
-    dates: `${nights} ночей в ${foundMonth}`,
-    travelersText: `${adults} взр.${children ? ' + ' + children + ' реб.' : ''}`,
+    departureCity: ctx.departureCity,
+    dates: `${ctx.nights} ночей в ${ctx.month}`,
+    travelersText: `${ctx.adults} взр.${ctx.children ? ' + ' + ctx.children + ' реб.' : ''}`,
+    expertTip: dest.expertTip || '💡 <b>Совет эксперта:</b> Менеджер с удовольствием скорректирует даты или категорию номера под ваш бюджет.',
     proposals: proposals
   };
 }
 
 // Render Bot Message with Rich Tour Proposal Cards & Links
 function renderBotProposalMessage(container, data) {
-  const intro = document.createElement("div");
-  intro.className = "bot-intro-text";
-  intro.innerHTML = `Здравствуйте! По вашему запросу я сформировала <b>профессиональную подборку туров</b> в <b>${data.destName}</b> с прямым вылетом из <b>${data.departureCity}</b> (${data.dates}, ${data.travelersText}):`;
+  const intro = document.createElement('div');
+  intro.className = 'bot-intro-text';
+  intro.innerHTML = data.agentIntro;
   container.appendChild(intro);
 
-  const cardsWrap = document.createElement("div");
-  cardsWrap.className = "tour-proposals-wrap";
+  const cardsWrap = document.createElement('div');
+  cardsWrap.className = 'tour-proposals-wrap';
 
   data.proposals.forEach(tour => {
-    const card = document.createElement("article");
-    card.className = "tour-card-mini";
+    const card = document.createElement('article');
+    card.className = 'tour-card-mini';
     card.innerHTML = `
       <div class="tour-card-mini-img">
         <img src="${tour.photos[0].url}" alt="${tour.hotelName}" loading="lazy">
@@ -710,10 +696,10 @@ function renderBotProposalMessage(container, data) {
         <div class="tour-card-mini-resort">📍 ${tour.resort}</div>
         
         <div class="tour-card-mini-specs">
-          <div class="spec-row"><i class="spec-ico">✈</i><div class="spec-txt"><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(" ")[0]} (багаж 20 кг включён)</div></div>
+          <div class="spec-row"><i class="spec-ico">✈</i><div class="spec-txt"><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(' ')[0]} (багаж 20 кг включён)</div></div>
           <div class="spec-row"><i class="spec-ico">🗓</i><div class="spec-txt"><b>${tour.datesText}</b></div></div>
           <div class="spec-row"><i class="spec-ico">🍽</i><div class="spec-txt"><b>${tour.food}</b></div></div>
-          <div class="spec-row"><i class="spec-ico">🏖</i><div class="spec-txt"><b>${tour.beach.split("(")[0]}</b></div></div>
+          <div class="spec-row"><i class="spec-ico">🏖</i><div class="spec-txt"><b>${tour.beach.split('(')[0]}</b></div></div>
         </div>
 
         <div class="tour-card-mini-perk">
@@ -752,24 +738,27 @@ function renderBotProposalMessage(container, data) {
 
   container.appendChild(cardsWrap);
 
-  const foot = document.createElement("div");
-  foot.className = "bot-foot-note";
-  foot.innerHTML = `✓ В стоимость тура включены: прямые перелёты туда-обратно с багажом 20 кг, групповой трансфер на минивэне, проживание, питание и медицинская страховка.<br><i>Нажмите на кнопку «Подробнее и рейсы», чтобы изучить галерею отеля, расписание перелётов и концепцию питания.</i>`;
+  const foot = document.createElement('div');
+  foot.className = 'bot-foot-note';
+  foot.innerHTML = `
+    <div style="margin-bottom:8px;">${data.expertTip}</div>
+    <div>✓ В стоимость включены: прямые перелёты туда-обратно с багажом 20 кг, трансфер на минивэне, проживание, питание и страховка.</div>
+  `;
   container.appendChild(foot);
 
   // Bind Buttons
-  $$("[data-open-tour]", container).forEach(btn => {
-    btn.addEventListener("click", (e) => {
+  $$('[data-open-tour]', container).forEach(btn => {
+    btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const id = btn.getAttribute("data-open-tour");
+      const id = btn.getAttribute('data-open-tour');
       openTourDetailModal(id);
     });
   });
 
-  $$("[data-book-tour]", container).forEach(btn => {
-    btn.addEventListener("click", (e) => {
+  $$('[data-book-tour]', container).forEach(btn => {
+    btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const id = btn.getAttribute("data-book-tour");
+      const id = btn.getAttribute('data-book-tour');
       const tour = window.toursRegistry[id];
       if (tour) {
         openLead(`Бронирование: ${tour.hotelName} ${tour.stars}★ (${tour.resort}, ${tour.datesShort}, ${tour.priceTotal})`);
@@ -799,8 +788,11 @@ function appendMessage(text, type = 'bot') {
   return m;
 }
 
-// Groq API Caller with Dynamic Parser & Enricher
+// Groq API Caller
 async function groqAiReply(text) {
+  const isFirstTurn = aiHistory.length === 0;
+  const proposalData = updateTravelContextAndGenerate(text, isFirstTurn);
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
 
@@ -808,26 +800,32 @@ async function groqAiReply(text) {
     const response = await fetch('https://turyrostova-groq-api-reklamadomodedovo-7709.vercel.app/api/ai', {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify({ message: text, history: aiHistory.slice(-6) }),
+      body: JSON.stringify({ message: text, history: aiHistory.slice(-8) }),
       signal: controller.signal
     });
 
     if (!response.ok) throw new Error('Groq network error');
     const data = await response.json();
-    if (!data.answer) throw new Error('Empty AI answer');
-
-    aiHistory.push({ role: 'user', content: text }, { role: 'assistant', content: data.answer });
-    
-    // Parse Groq output into rich structured data
-    const parsedData = parseAndEnrichGroqText(data.answer, text);
-    return { type: 'groq-parsed', data: parsedData };
+    if (data && data.answer) {
+      aiHistory.push({ role: 'user', content: text }, { role: 'assistant', content: data.answer });
+      
+      // If Groq gave a natural commentary, use its commentary as intro while filtering robotic greetings in follow-ups
+      let groqCommentary = data.answer.split(/(?:\d+[\.\)]\s+)/)[0].trim();
+      if (!isFirstTurn) {
+        groqCommentary = groqCommentary.replace(/^(?:Здравствуйте|Добрый день|Приветствую)[!.,\s]*/i, '');
+      }
+      if (groqCommentary && groqCommentary.length > 20) {
+        proposalData.agentIntro = groqCommentary;
+      }
+    }
   } catch (error) {
-    console.warn('Groq live fallback triggered:', error);
-    const smartData = generateSmartTourProposal(text);
-    return { type: 'smart', data: smartData };
+    console.warn('Groq live fallback:', error);
+    aiHistory.push({ role: 'user', content: text }, { role: 'assistant', content: proposalData.agentIntro });
   } finally {
     clearTimeout(timer);
   }
+
+  return { type: 'smart', data: proposalData };
 }
 
 // Send Message Handler
@@ -843,8 +841,7 @@ async function sendAiMessage(text) {
   const bubble = $('.chat-bubble', pending) || $('span', pending);
   bubble.innerHTML = '';
 
-  const proposalData = result.data || generateSmartTourProposal(text);
-  renderBotProposalMessage(bubble, proposalData);
+  renderBotProposalMessage(bubble, result.data);
 
   $('small', pending).textContent = now();
   const chatBody = $('#chatBody');
@@ -879,7 +876,7 @@ function openTourDetailModal(tourIdOrObject) {
   let tour = typeof tourIdOrObject === 'string' ? window.toursRegistry[tourIdOrObject] : tourIdOrObject;
 
   if (!tour) {
-    const smart = generateSmartTourProposal('Гоа на двоих в ноябре');
+    const smart = updateTravelContextAndGenerate('Гоа на двоих в ноябре', true);
     tour = smart.proposals[0];
   }
 
@@ -940,21 +937,21 @@ function openTourDetailModal(tourIdOrObject) {
           </div>
           <div class="flight-route-display">
             <div class="airport-col">
-              <strong>${tour.departureAirport || 'SVO'} · Москва</strong>
+              <strong>${tour.departureAirport || 'SVO'} · ${tour.departureCity || 'Москва'}</strong>
               <span>Шереметьево, Терминал C</span>
-              <time>08:30 · 05 ноя 2026</time>
+              <time>08:30 · 05 ${window.travelContext.month.slice(0,3)} 2026</time>
             </div>
             <div class="flight-route-middle">
               <span>${tour.flightHours || '7 ч 15 мин'} в пути</span>
               <div class="flight-line-indicator">
                 <span class="flight-plane-icon">✈</span>
               </div>
-              <small style="color:var(--muted);font-size:10px;">Прямой чартерный рейс</small>
+              <small style="color:var(--muted);font-size:10px;">Прямой рейс без пересадок</small>
             </div>
             <div class="airport-col" style="text-align:right;">
               <strong>${tour.destinationAirport || 'GOI'} · ${tour.resort.split(',')[0]}</strong>
-              <span>${tour.destinationAirportName || 'Даболим'}</span>
-              <time>17:45 · 05 ноя 2026</time>
+              <span>${tour.destinationAirportName || 'Аэропорт прилёта'}</span>
+              <time>17:45 · 05 ${window.travelContext.month.slice(0,3)} 2026</time>
             </div>
           </div>
           <div class="flight-amenities-row">
@@ -972,8 +969,8 @@ function openTourDetailModal(tourIdOrObject) {
           <div class="flight-route-display">
             <div class="airport-col">
               <strong>${tour.destinationAirport || 'GOI'} · ${tour.resort.split(',')[0]}</strong>
-              <span>${tour.destinationAirportName || 'Даболим'}</span>
-              <time>19:20 · 17 ноя 2026</time>
+              <span>${tour.destinationAirportName || 'Аэропорт вылета'}</span>
+              <time>19:20 · 17 ${window.travelContext.month.slice(0,3)} 2026</time>
             </div>
             <div class="flight-route-middle">
               <span>${tour.flightHours || '7 ч 30 мин'} в пути</span>
@@ -983,9 +980,9 @@ function openTourDetailModal(tourIdOrObject) {
               <small style="color:var(--muted);font-size:10px;">Прямой рейс без пересадок</small>
             </div>
             <div class="airport-col" style="text-align:right;">
-              <strong>${tour.departureAirport || 'SVO'} · Москва</strong>
+              <strong>${tour.departureAirport || 'SVO'} · ${tour.departureCity || 'Москва'}</strong>
               <span>Шереметьево, Терминал C</span>
-              <time>01:50 (+1) · 18 ноя</time>
+              <time>01:50 (+1) · 18 ${window.travelContext.month.slice(0,3)}</time>
             </div>
           </div>
           <div class="flight-amenities-row">
@@ -999,7 +996,7 @@ function openTourDetailModal(tourIdOrObject) {
           <div class="transfer-icon">🚐</div>
           <div class="transfer-text">
             <b>Групповой трансфер на комфортабельном минивэне/автобусе</b>
-            <p>Встреча с именной табличкой у выхода из терминала аэропорта. Доставка прямо до дверей ресепшн отеля (~45 минут). Кондиционер, питьевая вода и помощь с багажом.</p>
+            <p>Встреча с именной табличкой у выхода из терминала аэропорта. Доставка прямо до дверей отеля (~45 минут). Кондиционер, питьевая вода и помощь с багажом.</p>
           </div>
         </div>
       </div>
@@ -1010,23 +1007,23 @@ function openTourDetailModal(tourIdOrObject) {
       <div class="hotel-specs-grid">
         <div class="spec-box">
           <div class="spec-box-icon">🏖</div>
-          <h4>Пляж и море</h4>
+          <h4>Пляж и отдых</h4>
           <p>${tour.beach}. Мелкий золотистый песок, пологий удобный вход в воду, отсутствие сильных волн. Шезлонги, зонтики и пляжные полотенца предоставляются бесплатно.</p>
         </div>
         <div class="spec-box">
           <div class="spec-box-icon">🛏</div>
           <h4>Номер ${tour.room}</h4>
-          <p>Просторный номер с балконом или террасой. Большая двуспальная кровать King-Size, кондиционер с климат-контролем, мини-бар, сейф, быстрый Wi-Fi, халаты и тапочки.</p>
+          <p>Просторный номер с балконом или панорамной террасой. Большая двуспальная кровать King-Size, кондиционер с климат-контролем, мини-бар, сейф, быстрый Wi-Fi, халаты и тапочки.</p>
         </div>
         <div class="spec-box">
           <div class="spec-box-icon">🏊</div>
           <h4>Инфраструктура и бассейны</h4>
-          <p>2 открытых бассейна с зоной отдыха, SPA-комплекс с аутентичными оздоровительными процедурами, тренажёрный зал, лаундж-бары и экскурсионное бюро.</p>
+          <p>Открытые бассейны с подогревом и зоной отдыха, SPA-комплекс с аутентичными оздоровительными процедурами, тренажёрный зал, лаундж-бары и экскурсионное бюро.</p>
         </div>
         <div class="spec-box">
           <div class="spec-box-icon">📍</div>
           <h4>Расположение</h4>
-          <p>${tour.resort}. В пешей доступности уютные прибрежные кафе со свежими морепродуктами, колоритные сувенирные лавки и фруктовые рынки.</p>
+          <p>${tour.resort}. В пешей доступности уютные рестораны, живописные прогулочные зоны, набережные или канатные дороги.</p>
         </div>
       </div>
       <div class="hotel-desc-card">
@@ -1039,16 +1036,16 @@ function openTourDetailModal(tourIdOrObject) {
       <div class="spec-box" style="margin-bottom:16px;">
         <div class="spec-box-icon">🍽</div>
         <h4>Концепция питания: ${tour.food}</h4>
-        <p>Завтраки, обеды и ужины в главном ресторане по системе «шведский стол» с широким выбором европейских и местных блюд. В течение дня в барах доступны прохладительные и горячие напитки, тропические коктейли, свежие фрукты и легкие закуски.</p>
+        <p>Завтраки, обеды и ужины в главном ресторане по системе «шведский стол» с широким выбором блюд. В течение дня доступны напитки, авторские коктейли, свежие фрукты и легкие закуски.</p>
       </div>
       <div class="hotel-specs-grid">
         <div class="spec-box">
           <b>Главный ресторан</b>
-          <p>Завтрак 07:00–10:30, Обед 12:30–15:00, Ужин 19:00–22:00. Тематические вечера с грилем и морепродуктами.</p>
+          <p>Завтрак 07:00–10:30, Обед 12:30–15:00, Ужин 19:00–22:00. Тематические вечера с грилем и местными деликатесами.</p>
         </div>
         <div class="spec-box">
           <b>Бары и лаунджи</b>
-          <p>Пляжный бар и бар у бассейна с 10:00 до 23:00. Безалкогольные напитки, кофе, местное вино и коктейли.</p>
+          <p>Пляжный бар и бар у бассейна с 10:00 до 23:00. Безалкогольные и алкогольные напитки, кофе, вино и коктейли.</p>
         </div>
       </div>
     </div>
@@ -1060,7 +1057,7 @@ function openTourDetailModal(tourIdOrObject) {
           <span class="inclusion-check">✓</span>
           <div class="inclusion-card-text">
             <b>Прямые авиаперелеты туда и обратно</b>
-            <span>${tour.departureAirport || 'Москва'} ⇄ ${tour.destinationAirport || 'Гоа'}, ${tour.airline}</span>
+            <span>${tour.departureAirport || 'Москва'} ⇄ ${tour.destinationAirport || 'Курорт'}, ${tour.airline}</span>
           </div>
         </div>
         <div class="inclusion-card">
@@ -1216,99 +1213,6 @@ $$('.heart').forEach(h => h.addEventListener('click', () => {
   showToast(h.classList.contains('saved') ? 'Добавлено в избранное' : 'Удалено из избранного');
 }));
 
-// Pre-fill Homepage Cards in Tours Registry
-const HOMEPAGE_TOURS = [
-  {
-    id: 'home-crystal-sunset',
-    hotelName: 'Crystal Sunset Luxury Resort',
-    stars: 5,
-    rating: '4.8',
-    reviewsCount: 386,
-    country: 'Турция',
-    resort: 'Сиде',
-    beach: '1-я линия (150 м до моря, песчаный пляж)',
-    food: 'Всё включено',
-    room: 'Standard Room Sea View (32 м²)',
-    departureCity: 'Москвы',
-    departureAirport: 'SVO',
-    destinationAirport: 'AYT',
-    destinationAirportName: 'Анталья',
-    datesText: '8 ночей · 15–23 сентября 2026',
-    datesShort: '15–23 сен 2026',
-    nights: 8,
-    airline: 'Turkish Airlines (TK-3912)',
-    airlineReturn: 'Turkish Airlines (TK-3913)',
-    flightHours: '4 ч 20 мин',
-    priceTotal: '168 900 ₽',
-    priceOld: '189 000 ₽',
-    pricePerPerson: '84 450 ₽ / чел.',
-    discount: '-11%',
-    features: ['Аквапарк с 11 горками', '7 ресторанов a la carte', 'Песчаный пляж с пирсом', 'SPA-центр'],
-    photos: PHOTO_BANKS.turkey,
-    description: 'Один из лучших отелей Сиде для семейного и романтического отдыха. Обширная территория, аквапарк, великолепная кухня.'
-  },
-  {
-    id: 'home-serenity-alma',
-    hotelName: 'Serenity Alma Heights',
-    stars: 5,
-    rating: '4.7',
-    reviewsCount: 214,
-    country: 'Египет',
-    resort: 'Макади-Бей',
-    beach: '1-я линия (живой коралловый риф)',
-    food: 'Всё включено',
-    room: 'Family Room (42 м²)',
-    departureCity: 'Москвы',
-    departureAirport: 'SVO',
-    destinationAirport: 'HRG',
-    destinationAirportName: 'Хургада',
-    datesText: '9 ночей · 18–27 сентября 2026',
-    datesShort: '18–27 сен 2026',
-    nights: 9,
-    airline: 'Air Cairo (SM-902)',
-    airlineReturn: 'Air Cairo (SM-903)',
-    flightHours: '5 ч 10 мин',
-    priceTotal: '214 500 ₽',
-    priceOld: '238 000 ₽',
-    pricePerPerson: '107 250 ₽ / чел.',
-    discount: '-10%',
-    features: ['Собственный аквапарк', 'Красочный коралловый риф', 'Детский луна-парк', 'Подогреваемые бассейны'],
-    photos: PHOTO_BANKS.egypt,
-    description: 'Отель в живописном заливе Макади-Бей. Прекрасный риф, луна-парк и разнообразная детская анимация.'
-  },
-  {
-    id: 'home-rixos-bab-al-bahr',
-    hotelName: 'Rixos Bab Al Bahr',
-    stars: 5,
-    rating: '4.8',
-    reviewsCount: 529,
-    country: 'ОАЭ',
-    resort: 'Рас-эль-Хайма',
-    beach: '1-я линия (песчаный пляж острова Марджан)',
-    food: 'Ультра всё включено',
-    room: 'Deluxe Room (35 м²)',
-    departureCity: 'Москвы',
-    departureAirport: 'SVO',
-    destinationAirport: 'DXB',
-    destinationAirportName: 'Дубай',
-    datesText: '7 ночей · 20–27 октября 2026',
-    datesShort: '20–27 окт 2026',
-    nights: 7,
-    airline: 'Flydubai (FZ-968)',
-    airlineReturn: 'Flydubai (FZ-969)',
-    flightHours: '5 ч 30 мин',
-    priceTotal: '189 600 ₽',
-    priceOld: '215 000 ₽',
-    pricePerPerson: '94 800 ₽ / чел.',
-    discount: '-12%',
-    features: ['Ультра всё включено в ОАЭ', '8 бассейнов и инфинити', '14 ресторанов и баров', 'Пляжные вечеринки'],
-    photos: PHOTO_BANKS.uae,
-    description: 'Престижный курорт в Рас-эль-Хайме с редкой для Эмиратов концепцией Ultra All Inclusive.'
-  }
-];
-
-HOMEPAGE_TOURS.forEach(t => { window.toursRegistry[t.id] = t; });
-
 // Connect "Подробнее" buttons on homepage to the rich Tour Detail Modal
 $$('[data-tour]').forEach(b => {
   b.addEventListener('click', (e) => {
@@ -1318,7 +1222,7 @@ $$('[data-tour]').forEach(b => {
     if (found) {
       openTourDetailModal(found);
     } else {
-      const smart = generateSmartTourProposal(tourName);
+      const smart = updateTravelContextAndGenerate(tourName, false);
       openTourDetailModal(smart.proposals[0]);
     }
   });
@@ -1424,4 +1328,4 @@ $('#quickForm')?.addEventListener('submit', e => {
   }, 250);
 });
 
-console.log('Ростов-Елена-Тур: AI Pro Tour Proposals Engine v3 initialized.');
+console.log('Ростов-Елена-Тур: AI Travel Agent Engine v6 initialized.');
