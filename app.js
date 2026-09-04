@@ -1,8 +1,8 @@
-// Ростов-Елена-Тур — Главный клиентский скрипт
+// Ростов-Елена-Тур — Главный клиентский скрипт (v3 Professional Tour Proposals)
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
 
-// Global Tour Registry for interactive modals
+// Global Tour Registry for interactive modals & shareable links
 window.toursRegistry = {};
 
 // Default departure date (+14 days)
@@ -12,15 +12,17 @@ const dateInput = $('#tourDate');
 if (dateInput) dateInput.value = today.toISOString().slice(0, 10);
 
 // Intersection Observer for scroll animations
-if (typeof IntersectionObserver !== "undefined") { const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.12 });
-$$('.reveal').forEach(el => observer.observe(el)); }
+if (typeof IntersectionObserver !== 'undefined') {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  $$('.reveal').forEach(el => observer.observe(el));
+}
 
 // Mobile Navigation
 const menu = $('#nav');
@@ -43,10 +45,10 @@ function showToast(title, sub = 'Тур сохранён для сравнени
   setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
-// Phone Mask Formatting
+// Phone Mask Formatting (+7 (XXX) XXX-XX-XX)
 function applyPhoneMask(input) {
   if (!input) return;
-  input.addEventListener('input', (e) => {
+  input.addEventListener('input', () => {
     let val = input.value.replace(/\D/g, '');
     if (val.startsWith('7') || val.startsWith('8')) val = val.slice(1);
     val = val.slice(0, 10);
@@ -97,596 +99,474 @@ function now() {
   return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 }
 
+// Photo Banks for High-Resolution Galleries
+const PHOTO_BANKS = {
+  goa: [
+    { url: 'https://images.pexels.com/photos/1007657/pexels-photo-1007657.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Пляж и пальмы' },
+    { url: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн отеля' },
+    { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер Deluxe' },
+    { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Ресторан у пляжа' }
+  ],
+  turkey: [
+    { url: 'https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Побережье Средиземного моря' },
+    { url: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн и горки' },
+    { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер' },
+    { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Ресторан' }
+  ],
+  egypt: [
+    { url: 'https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Красное море' },
+    { url: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Аквапарк' },
+    { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер Superior' },
+    { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн' }
+  ],
+  uae: [
+    { url: 'https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Побережье ОАЭ' },
+    { url: 'https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Остров Марджан' },
+    { url: 'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер Deluxe' },
+    { url: 'https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн' }
+  ],
+  maldives: [
+    { url: 'https://images.pexels.com/photos/1483053/pexels-photo-1483053.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Водные виллы' },
+    { url: 'https://images.pexels.com/photos/1007657/pexels-photo-1007657.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бирюзовая лагуна' },
+    { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Вилла с видом на океан' },
+    { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Ресторан над водой' }
+  ],
+  thailand: [
+    { url: 'https://images.pexels.com/photos/164041/pexels-photo-164041.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Пляж Карон' },
+    { url: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн в саду' },
+    { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер Deluxe' },
+    { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Тайский ресторан' }
+  ],
+  russia: [
+    { url: 'https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Кавказские горы' },
+    { url: 'https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн с панорамой' },
+    { url: 'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Интерьер отеля' },
+    { url: 'https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Спа-комплекс' }
+  ]
+};
+
 // Curated Destination Database
 const DESTINATIONS_DB = {
   goa: {
     keys: /гоа|инди|goa|india|кавелоссим|калангут|бага|палолем|морджим/,
-    country: "Индия",
-    resort: "Гоа",
-    airportCode: "GOI",
-    airportName: "Даболим (GOI)",
-    flightHours: "7 ч 15 мин",
-    airline: "Azur Air (ZF-7711)",
-    airlineReturn: "Azur Air (ZF-7712)",
+    country: 'Индия',
+    resort: 'Гоа',
+    airportCode: 'GOI',
+    airportName: 'Даболим (GOI)',
+    flightHours: '7 ч 15 мин',
+    airline: 'Azur Air (ZF-7711)',
+    airlineReturn: 'Azur Air (ZF-7712)',
     basePrice: 118000,
-    foodDefault: "Всё включено (All Inclusive)",
+    foodDefault: 'Всё включено (All Inclusive)',
+    photos: PHOTO_BANKS.goa,
     hotels: [
       {
-        name: "Sunrise Beach Resort",
+        name: 'Sunrise Beach Resort',
         stars: 4,
-        rating: "4.8",
+        rating: '4.8',
         reviewsCount: 386,
-        resort: "Южный Гоа, Кавелоссим",
-        beach: "1-я линия (80 м, широкий песчаный пляж)",
-        food: "Всё включено (All Inclusive)",
-        room: "Deluxe Garden View (38 м²)",
+        resort: 'Южный Гоа, Кавелоссим',
+        beach: '1-я линия (80 м, широкий песчаный пляж)',
+        food: 'Всё включено (All Inclusive)',
+        room: 'Deluxe Garden View (38 м²)',
         features: [
-          "3 авторские экскурсии в подарок (водопад Дудхсагар, Старый Гоа, сад специй)",
-          "Бесплатный трансфер на кондиционированном минивэне",
-          "Собственный оборудованный пляж с шезлонгами",
-          "SPA-центр с аюрведическими программами"
+          '3 авторские экскурсии в подарок (водопад Дудхсагар, Старый Гоа, сад специй)',
+          'Бесплатный трансфер на кондиционированном минивэне',
+          'Собственный оборудованный пляж с шезлонгами',
+          'SPA-центр с аюрведическими программами'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/1007657/pexels-photo-1007657.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляж Кавелоссим" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн отеля" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Deluxe" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Ресторан на пляже" }
-        ],
-        desc: "Элегантный курортный комплекс на первой линии южного побережья Гоа. Окружен тропическим садом, предлагает приватный песчаный пляж с пологим входом в воду и изысканную кухню."
+        photos: PHOTO_BANKS.goa,
+        desc: 'Элегантный курортный комплекс на первой линии южного побережья Гоа. Окружен тропическим садом, предлагает приватный песчаный пляж с пологим входом в воду и изысканную кухню.'
       },
       {
-        name: "Caravela Beach Resort",
+        name: 'Caravela Beach Resort',
         stars: 5,
-        rating: "4.9",
+        rating: '4.9',
         reviewsCount: 520,
-        resort: "Южный Гоа, Варка",
-        beach: "1-я линия (50 м, белоснежный песок)",
-        food: "Ультра всё включено",
-        room: "Superior Ocean Front (44 м²)",
+        resort: 'Южный Гоа, Варка',
+        beach: '1-я линия (50 м, белоснежный песок)',
+        food: 'Ультра всё включено',
+        room: 'Superior Ocean Front (44 м²)',
         features: [
-          "Гольф-поле на 9 лунок и теннисные корты",
-          "Большой лагунный бассейн с баром в воде",
-          "Ужин под звёздами на берегу океана",
-          "Индивидуальный VIP-трансфер из аэропорта"
+          'Гольф-поле на 9 лунок и теннисные корты',
+          'Большой лагунный бассейн с баром в воде',
+          'Ужин под звёздами на берегу океана',
+          'Индивидуальный VIP-трансфер из аэропорта'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/1078983/pexels-photo-1078983.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Панорама побережья" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Территория отеля" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Superior" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Спа-комплекс" }
-        ],
-        desc: "Премиальный пятизвездочный отель на уединенном пляже Варка. Идеален для романтического отдыха и полной перезагрузки под шум океанского прибоя."
+        photos: PHOTO_BANKS.goa,
+        desc: 'Премиальный пятизвездочный отель на уединенном пляже Варка. Идеален для романтического отдыха и полной перезагрузки под шум океанского прибоя.'
       },
       {
-        name: "Royal Orchid Beach Resort & Spa",
+        name: 'Royal Orchid Beach Resort & Spa',
         stars: 5,
-        rating: "4.8",
+        rating: '4.8',
         reviewsCount: 442,
-        resort: "Южный Гоа, Уторда",
-        beach: "1-я линия (прямой выход на пляж)",
-        food: "Всё включено (All Inclusive)",
-        room: "Club Room Pool View (40 м²)",
+        resort: 'Южный Гоа, Уторда',
+        beach: '1-я линия (прямой выход на пляж)',
+        food: 'Всё включено (All Inclusive)',
+        room: 'Club Room Pool View (40 м²)',
         features: [
-          "4 авторские экскурсии по Гоа в подарок",
-          "Бесплатный день в SPA и сеанс массажа",
-          "3 ресторана: морепродукты, индийская и европейская кухня",
-          "Русскоязычный консьерж 24/7"
+          '4 авторские экскурсии по Гоа в подарок',
+          'Бесплатный день в SPA и сеанс массажа',
+          '3 ресторана: морепродукты, индийская и европейская кухня',
+          'Русскоязычный консьерж 24/7'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/189296/pexels-photo-189296.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Закат на пляже" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн и пальмы" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Интерьер номера" },
-          { url: "https://images.pexels.com/photos/1287460/pexels-photo-1287460.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Лаундж-зона" }
-        ],
-        desc: "Пятизвездочный отель с просторной зеленой территорией и прямым выходом к песчаному пляжу Уторда. Высочайший уровень сервиса и превосходная гастрономия."
+        photos: PHOTO_BANKS.goa,
+        desc: 'Пятизвездочный отель с просторной зеленой территорией и прямым выходом к песчаному пляжу Уторда. Высочайший уровень сервиса и превосходная гастрономия.'
       }
     ]
   },
   turkey: {
     keys: /турц|антал|алани|сиде|кемер|белек|бодрум|стамбул/,
-    country: "Турция",
-    resort: "Анталья / Сиде / Кемер",
-    airportCode: "AYT",
-    airportName: "Анталья (AYT)",
-    flightHours: "4 ч 20 мин",
-    airline: "Turkish Airlines (TK-3912)",
-    airlineReturn: "Turkish Airlines (TK-3913)",
+    country: 'Турция',
+    resort: 'Анталья / Сиде / Кемер',
+    airportCode: 'AYT',
+    airportName: 'Анталья (AYT)',
+    flightHours: '4 ч 20 мин',
+    airline: 'Turkish Airlines (TK-3912)',
+    airlineReturn: 'Turkish Airlines (TK-3913)',
     basePrice: 84000,
-    foodDefault: "Ультра всё включено",
+    foodDefault: 'Ультра всё включено',
+    photos: PHOTO_BANKS.turkey,
     hotels: [
       {
-        name: "Crystal Sunset Luxury Resort & Spa",
+        name: 'Crystal Sunset Luxury Resort & Spa',
         stars: 5,
-        rating: "4.8",
+        rating: '4.8',
         reviewsCount: 386,
-        resort: "Турция · Сиде",
-        beach: "1-я линия (150 м, песчаный пляж)",
-        food: "Ультра всё включено 24/7",
-        room: "Standard Side Sea View (32 м²)",
+        resort: 'Турция · Сиде',
+        beach: '1-я линия (150 м, песчаный пляж)',
+        food: 'Ультра всё включено 24/7',
+        room: 'Standard Side Sea View (32 м²)',
         features: [
-          "Большой аквапарк с 11 водными горками",
-          "7 ресторанов a la carte и 9 баров",
-          "Собственный песчаный пляж с пирсом",
-          "Детский клуб Crispy с анимацией"
+          'Большой аквапарк с 11 водными горками',
+          '7 ресторанов a la carte и 9 баров',
+          'Собственный песчаный пляж с пирсом',
+          'Детский клуб Crispy с анимацией'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Побережье Сиде" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Аквапарк и бассейн" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер отеля" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Главный ресторан" }
-        ],
-        desc: "Роскошный курортный комплекс в Сиде с огромной инфраструктурой, аквапарком, спа-центром и круглосуточной системой «Ультра всё включено»."
+        photos: PHOTO_BANKS.turkey,
+        desc: 'Роскошный курортный комплекс в Сиде с огромной инфраструктурой, аквапарком, спа-центром и круглосуточной системой «Ультра всё включено».'
       },
       {
-        name: "Akka Antedon Hotel",
+        name: 'Akka Antedon Hotel',
         stars: 5,
-        rating: "4.9",
+        rating: '4.9',
         reviewsCount: 610,
-        resort: "Турция · Кемер, Бельдиби",
-        beach: "1-я линия (50 м, сосновый парк и горы)",
-        food: "Премиум всё включено",
-        room: "Family Duplex Suite (52 м²)",
+        resort: 'Турция · Кемер, Бельдиби',
+        beach: '1-я линия (50 м, сосновый парк и горы)',
+        food: 'Премиум всё включено',
+        room: 'Family Duplex Suite (52 м²)',
         features: [
-          "Живописное сочетание сосен, моря и Таврских гор",
-          "Высочайший рейтинг семейного сервиса",
-          "Спа-центр с турецким хаммамом и сауной",
-          "Трансфер из аэропорта на комфортном автобусе"
+          'Живописное сочетание сосен, моря и Таврских гор',
+          'Высочайший рейтинг семейного сервиса',
+          'Спа-центр с турецким хаммамом и сауной',
+          'Трансфер из аэропорта на комфортном автобусе'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бухта Кемера" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Сосновый парк" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Семейный номер" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляжный пирс" }
-        ],
-        desc: "Премиальный семейный отель в окружении реликтовых сосен у подножия гор. Чистейшее лазурное море и безупречная гастрономия."
-      },
-      {
-        name: "Rixos Premium Belek",
-        stars: 5,
-        rating: "4.9",
-        reviewsCount: 780,
-        resort: "Турция · Белек",
-        beach: "1-я линия (километровый песчаный пляж)",
-        food: "All Exclusive All Inclusive",
-        room: "Deluxe Room Garden View (37 м²)",
-        features: [
-          "Бесплатный безлимитный доступ в тематический парк The Land of Legends",
-          "Шоу поющих фонтанов и концерты мировых звезд",
-          "SPA-комплекс Anjana с балийскими мастерами",
-          "VIP трансфер и персональный ассистент"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Территория Rixos" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейны и виллы" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Deluxe" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Ресторан высокой кухни" }
-        ],
-        desc: "Легендарный отель в Белеке, сочетающий роскошь, великолепный песчаный пляж, гастрономию от шеф-поваров со звездами Мишлен и парк аттракционов."
+        photos: PHOTO_BANKS.turkey,
+        desc: 'Премиальный семейный отель в окружении реликтовых сосен у подножия гор. Чистейшее лазурное море и безупречная гастрономия.'
       }
     ]
   },
   egypt: {
     keys: /егип|шарм|хургад|макади|красн.*мор/,
-    country: "Египет",
-    resort: "Шарм-эль-Шейх / Макади-Бей",
-    airportCode: "SSH",
-    airportName: "Шарм-эль-Шейх (SSH)",
-    flightHours: "5 ч 10 мин",
-    airline: "Air Cairo (SM-902)",
-    airlineReturn: "Air Cairo (SM-903)",
+    country: 'Египет',
+    resort: 'Шарм-эль-Шейх / Макади-Бей',
+    airportCode: 'SSH',
+    airportName: 'Шарм-эль-Шейх (SSH)',
+    flightHours: '5 ч 10 мин',
+    airline: 'Air Cairo (SM-902)',
+    airlineReturn: 'Air Cairo (SM-903)',
     basePrice: 78000,
-    foodDefault: "Всё включено (All Inclusive)",
+    foodDefault: 'Всё включено (All Inclusive)',
+    photos: PHOTO_BANKS.egypt,
     hotels: [
       {
-        name: "Serenity Alma Heights",
+        name: 'Serenity Alma Heights',
         stars: 5,
-        rating: "4.7",
+        rating: '4.7',
         reviewsCount: 214,
-        resort: "Египет · Макади-Бей",
-        beach: "1-я линия (живой коралловый риф)",
-        food: "Всё включено (All Inclusive)",
-        room: "Superior Family Room (42 м²)",
+        resort: 'Египет · Макади-Бей',
+        beach: '1-я линия (живой коралловый риф)',
+        food: 'Всё включено (All Inclusive)',
+        room: 'Superior Family Room (42 м²)',
         features: [
-          "Огромный аквапарк и парк аттракционов",
-          "Живой коралловый риф для снорклинга",
-          "Детский луна-парк и анимационные шоу",
-          "Медицинская страховка и трансфер включены"
+          'Огромный аквапарк и парк аттракционов',
+          'Живой коралловый риф для снорклинга',
+          'Детский луна-парк и анимационные шоу',
+          'Медицинская страховка и трансфер включены'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляж и Красное море" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Аквапарк отеля" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Superior" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн с подогревом" }
-        ],
-        desc: "Идеальный отель для семейного отдыха в заливе Макади-Бей с собственным коралловым рифом, масштабным аквапарком и теплым морем круглый год."
-      },
-      {
-        name: "Reef Oasis Beach Resort",
-        stars: 5,
-        rating: "4.8",
-        reviewsCount: 512,
-        resort: "Египет · Шарм-эль-Шейх, Рас Ум Сид",
-        beach: "1-я линия (бухта без ветра, песчаный вход и риф)",
-        food: "Премиум всё включено",
-        room: "Sea Breeze Room (38 м²)",
-        features: [
-          "Самая защищенная от зимних ветров бухта Шарм-эль-Шейха",
-          "Один из лучших коралловых рифов Синая",
-          "10 открытых бассейнов и джакузи с видом на море",
-          "Морская экскурсия на остров Тиран в подарок"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бухта Рас Ум Сид" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Каскадные бассейны" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер с видом на море" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Панорамная терраса" }
-        ],
-        desc: "Расположен на утесе с фантастическим панорамным видом на Красное море и остров Тиран. Уникальный пляж с песчаным заходом для детей и богатейшим коралловым рифом."
-      },
-      {
-        name: "Pickalbatros Palace Resort",
-        stars: 5,
-        rating: "4.9",
-        reviewsCount: 680,
-        resort: "Египет · Хургада",
-        beach: "1-я линия (песчаный пляж с лагунами)",
-        food: "Ультра всё включено",
-        room: "Deluxe Pool View (40 м²)",
-        features: [
-          "Королевская архитектура и роскошная зеленая территория",
-          "6 тематических ресторанов (итальянский, азиатский, марокканский)",
-          "Бассейны общей площадью более 4000 м²",
-          "Экскурсия к пирамидам Луксора с комфортным трансфером"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляж в Хургаде" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Огромный бассейн" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Интерьер номера" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Восточный дворец" }
-        ],
-        desc: "Дворцовый отель сети Pickalbatros на берегу Красного моря. Безупречное питание, высочайший уровень сервиса и восточное гостеприимство."
+        photos: PHOTO_BANKS.egypt,
+        desc: 'Идеальный отель для семейного отдыха в заливе Макади-Бей с собственным коралловым рифом, масштабным аквапарком и теплым морем круглый год.'
       }
     ]
   },
   uae: {
     keys: /оаэ|эмират|дуба|рас-эль-хайм|абу-даби|шардж/,
-    country: "ОАЭ",
-    resort: "Дубай / Рас-эль-Хайма",
-    airportCode: "DXB",
-    airportName: "Дубай (DXB)",
-    flightHours: "5 ч 30 мин",
-    airline: "Flydubai (FZ-968)",
-    airlineReturn: "Flydubai (FZ-969)",
+    country: 'ОАЭ',
+    resort: 'Дубай / Рас-эль-Хайма',
+    airportCode: 'DXB',
+    airportName: 'Дубай (DXB)',
+    flightHours: '5 ч 30 мин',
+    airline: 'Flydubai (FZ-968)',
+    airlineReturn: 'Flydubai (FZ-969)',
     basePrice: 96000,
-    foodDefault: "Ультра всё включено",
+    foodDefault: 'Ультра всё включено',
+    photos: PHOTO_BANKS.uae,
     hotels: [
       {
-        name: "Rixos Bab Al Bahr",
+        name: 'Rixos Bab Al Bahr',
         stars: 5,
-        rating: "4.8",
+        rating: '4.8',
         reviewsCount: 529,
-        resort: "ОАЭ · Рас-эль-Хайма, Марджан",
-        beach: "1-я линия (собственный пляж острова Марджан)",
-        food: "Ультра всё включено",
-        room: "Deluxe Room Island View (35 м²)",
+        resort: 'ОАЭ · Рас-эль-Хайма, Марджан',
+        beach: '1-я линия (собственный пляж острова Марджан)',
+        food: 'Ультра всё включено',
+        room: 'Deluxe Room Island View (35 м²)',
         features: [
-          "Редкая для ОАЭ система «Ультра всё включено»",
-          "8 бассейнов и отдельный инфинити-бассейн",
-          "14 ресторанов и баров мирового уровня",
-          "Пляжные вечеринки и живые концерты"
+          'Редкая для ОАЭ система «Ультра всё включено»',
+          '8 бассейнов и отдельный инфинити-бассейн',
+          '14 ресторанов и баров мирового уровня',
+          'Пляжные вечеринки и живые концерты'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Побережье Эмиратов" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Остров Аль Марджан" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Deluxe" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн и пляж" }
-        ],
-        desc: "Курорт в форме пирамид на искусственном острове Аль-Марджан. Неограниченное питание и напитки, песчаный пляж и премиальный комфорт."
-      },
-      {
-        name: "Rove La Mer Beach",
-        stars: 4,
-        rating: "4.8",
-        reviewsCount: 460,
-        resort: "ОАЭ · Дубай, Джумейра",
-        beach: "1-я линия (прямой выход на модный пляж Ла Мер)",
-        food: "Завтраки + Ужины (HB)",
-        room: "Rover Room Sea View (26 м²)",
-        features: [
-          "Самое стильное побережье Дубая с ресторанами и бутиками",
-          "Бассейн с видом на Персидский залив и Бурдж Халифу",
-          "Бесплатный шаттл до Dubai Mall и метро",
-          "Экскурсия по современному Дубаю в подарок"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Дубай и Ла Мер" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Инфинити бассейн" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Стильный номер" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляжный лаундж" }
-        ],
-        desc: "Ультрамодный дизайнерский отель прямо на песчаном пляже La Mer. Идеальная локация для сочетания пляжного релакса и шопинга в Дубае."
-      },
-      {
-        name: "Atlantis, The Palm",
-        stars: 5,
-        rating: "4.9",
-        reviewsCount: 1250,
-        resort: "ОАЭ · Дубай, Пальма Джумейра",
-        beach: "1-я линия (приватный километровый пляж)",
-        food: "Полупансион (Dine Around)",
-        room: "Ocean King Room (47 м²)",
-        features: [
-          "Безлимитный доступ в крупнейший в мире аквапарк Aquaventure",
-          "Вход в грандиозный океанариум The Lost Chambers",
-          "Рестораны от шефов Gordon Ramsay и Nobu",
-          "Индивидуальный трансфер на премиальном авто"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пальма Джумейра" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Отель-дворец Атлантис" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Люкс Ocean King" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Аквапарк Aquaventure" }
-        ],
-        desc: "Культовый курорт на вершине Пальмы Джумейра. Легендарный сервис, мировые гастрономические шедевры и незабываемые впечатления."
+        photos: PHOTO_BANKS.uae,
+        desc: 'Курорт в форме пирамид на искусственном острове Аль-Марджан. Неограниченное питание и напитки, песчаный пляж и премиальный комфорт.'
       }
     ]
   },
   maldives: {
     keys: /мальдив|мале|атолл/,
-    country: "Мальдивы",
-    resort: "Южный Мале / Северный Мале",
-    airportCode: "MLE",
-    airportName: "Мале Велана (MLE)",
-    flightHours: "8 ч 40 мин",
-    airline: "Аэрофлот (SU-320)",
-    airlineReturn: "Аэрофлот (SU-321)",
+    country: 'Мальдивы',
+    resort: 'Южный Мале / Северный Мале',
+    airportCode: 'MLE',
+    airportName: 'Мале Велана (MLE)',
+    flightHours: '8 ч 40 мин',
+    airline: 'Аэрофлот (SU-320)',
+    airlineReturn: 'Аэрофлот (SU-321)',
     basePrice: 180000,
-    foodDefault: "Премиум всё включено",
+    foodDefault: 'Премиум всё включено',
+    photos: PHOTO_BANKS.maldives,
     hotels: [
       {
-        name: "Sun Siyam Olhuveli",
+        name: 'Sun Siyam Olhuveli',
         stars: 5,
-        rating: "4.9",
+        rating: '4.9',
         reviewsCount: 812,
-        resort: "Мальдивы · Южный Мале",
-        beach: "1-я линия (бирюзовая лагуна)",
-        food: "Премиум всё включено",
-        room: "Water Villa with Private Pool (64 м²)",
+        resort: 'Мальдивы · Южный Мале',
+        beach: '1-я линия (бирюзовая лагуна)',
+        food: 'Премиум всё включено',
+        room: 'Water Villa with Private Pool (64 м²)',
         features: [
-          "Вилла прямо над водой с собственным спуском в лагуну",
-          "Скоростной трансфер на катере аэропорт ⇄ отель",
-          "Дайвинг-центр PADI и снорклинг со скатами мантами",
-          "Романтический ужин на закате на пляже"
+          'Вилла прямо над водой с собственным спуском в лагуну',
+          'Скоростной трансфер на катере аэропорт ⇄ отель',
+          'Дайвинг-центр PADI и снорклинг со скатами мантами',
+          'Романтический ужин на закате на пляже'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/1483053/pexels-photo-1483053.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Водные виллы" },
-          { url: "https://images.pexels.com/photos/1007657/pexels-photo-1007657.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бирюзовая лагуна" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Вилла с видом на океан" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Ресторан над водой" }
-        ],
-        desc: "Курорт на трёх соединенных островах посреди кристальной бирюзовой лагуны. Живописный домашний риф, виллы над океаном и спа мирового уровня."
-      },
-      {
-        name: "Bandos Maldives",
-        stars: 4,
-        rating: "4.8",
-        reviewsCount: 650,
-        resort: "Мальдивы · Северный Мале",
-        beach: "1-я линия (песчаная коса и риф)",
-        food: "Всё включено (All Inclusive)",
-        room: "Deluxe Beachfront Room (53 м²)",
-        features: [
-          "Всего 15 минут на скоростном катере от аэропорта Мале",
-          "Один из лучших домашних рифов на Мальдивах",
-          "Детский клуб Kokko Club с насыщенной программой",
-          "Круиз на закате с дельфинами в подарок"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/1007657/pexels-photo-1007657.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Остров Бандос" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляжные виллы" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Deluxe" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Закат над океаном" }
-        ],
-        desc: "Остров-курорт с богатейшей тропической растительностью и великолепным домашним рифом в 40 метрах от берега. Идеален для первого знакомства с Мальдивами."
-      },
-      {
-        name: "Meeru Island Resort & Spa",
-        stars: 4,
-        rating: "4.9",
-        reviewsCount: 920,
-        resort: "Мальдивы · Северный Мале",
-        beach: "1-я линия (1.5 км песчаных пляжей)",
-        food: "All Inclusive Plus",
-        room: "Jacuzzi Water Villa (85 м²)",
-        features: [
-          "Водная вилла с джакузи под открытым небом",
-          "Два отдельных бассейна (для семей и Adults Only)",
-          "Поле для гольфа, виндсерфинг и каякинг",
-          "Экскурсия на необитаемый остров"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/1483053/pexels-photo-1483053.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Водные виллы Миру" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Инфинити бассейн" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Спа над водой" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Ресторан на песке" }
-        ],
-        desc: "Просторный остров с бесконечными песчаными пляжами, романтическими виллами на сваях и продуманным разделением на спокойные и семейные зоны."
+        photos: PHOTO_BANKS.maldives,
+        desc: 'Курорт на трёх соединенных островах посреди кристальной бирюзовой лагуны. Живописный домашний риф, виллы над океаном и спа мирового уровня.'
       }
     ]
   },
   thailand: {
     keys: /таил|пхукет|паттай|самуи|краби|као-лак/,
-    country: "Таиланд",
-    resort: "Пхукет / Паттайя",
-    airportCode: "HKT",
-    airportName: "Пхукет (HKT)",
-    flightHours: "9 ч 10 мин",
-    airline: "Аэрофлот (SU-274)",
-    airlineReturn: "Аэрофлот (SU-275)",
+    country: 'Таиланд',
+    resort: 'Пхукет / Паттайя',
+    airportCode: 'HKT',
+    airportName: 'Пхукет (HKT)',
+    flightHours: '9 ч 10 мин',
+    airline: 'Аэрофлот (SU-274)',
+    airlineReturn: 'Аэрофлот (SU-275)',
     basePrice: 130000,
-    foodDefault: "Завтраки (Шведский стол)",
+    foodDefault: 'Завтраки (Шведский стол)',
+    photos: PHOTO_BANKS.thailand,
     hotels: [
       {
-        name: "Pullman Phuket Karon Beach Resort",
+        name: 'Pullman Phuket Karon Beach Resort',
         stars: 5,
-        rating: "4.8",
+        rating: '4.8',
         reviewsCount: 418,
-        resort: "Таиланд · Пхукет, Карон",
-        beach: "1-я линия (через дорогу от пляжа Карон с «поющим» песком)",
-        food: "Завтраки (Шведский стол)",
-        room: "Deluxe Sea View (45 м²)",
+        resort: 'Таиланд · Пхукет, Карон',
+        beach: '1-я линия (через дорогу от пляжа Карон с «поющим» песком)',
+        food: 'Завтраки (Шведский стол)',
+        room: 'Deluxe Sea View (45 м²)',
         features: [
-          "Огромный тропический сад площадью 75 гектаров",
-          "5 открытых бассейнов со слайдами",
-          "3 ресторана тайской и европейской кухни",
-          "Экскурсия на острова Пхи-Пхи в подарок"
+          'Огромный тропический сад площадью 75 гектаров',
+          '5 открытых бассейнов со слайдами',
+          '3 ресторана тайской и европейской кухни',
+          'Экскурсия на острова Пхи-Пхи в подарок'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/164041/pexels-photo-164041.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляж Карон" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн в саду" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер Deluxe" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Тайский ресторан" }
-        ],
-        desc: "Флагманский отель на лучшем пляже Пхукета с поющим скрипящим песком. Тропический парк, первоклассный сервис и близость к ресторанам."
-      },
-      {
-        name: "Centara Grand Mirage Beach Resort",
-        stars: 5,
-        rating: "4.9",
-        reviewsCount: 680,
-        resort: "Таиланд · Паттайя, Вонгамат",
-        beach: "1-я линия (прямой выход на приватный пляж)",
-        food: "Завтраки + Ужины (HB)",
-        room: "Deluxe Ocean Facing (42 м²)",
-        features: [
-          "Грандиозный тематический аквапарк «Затерянный мир»",
-          "Ленивая река, водопады и тарзанки",
-          "Все номера с гарантированным панорамным видом на океан",
-          "Спа-комплекс Cenvaree с тайским массажем"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/164041/pexels-photo-164041.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляж Вонгамат" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Аквапарк Lost World" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Вид из номера" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Тропический бассейн" }
-        ],
-        desc: "Уникальный курорт в стиле приключенческого фильма в престижном районе Паттайи. Непревзойденный аквапарк и потрясающие виды на Сиамский залив."
-      },
-      {
-        name: "Sunwing Kamala Beach",
-        stars: 4,
-        rating: "4.8",
-        reviewsCount: 530,
-        resort: "Таиланд · Пхукет, Камала",
-        beach: "1-я линия (прямо на песке уютной бухты Камала)",
-        food: "Завтраки (Шведский стол)",
-        room: "Studio Suite Pool View (44 м²)",
-        features: [
-          "8 бассейнов, включая детские с мягким дном",
-          "Детский клуб Lollo & Bernie с развивающими играми",
-          "Спокойное море без волн и пологий заход",
-          "Медицинская страховка и трансфер включены"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/164041/pexels-photo-164041.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бухта Камала" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн отеля" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Сьют Studio" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Пляжное кафе" }
-        ],
-        desc: "Признанный лидер семейного отдыха на Пхукете. Расположен прямо на золотом песке тихой бухты Камала в окружении пальм."
+        photos: PHOTO_BANKS.thailand,
+        desc: 'Флагманский отель на лучшем пляже Пхукета с поющим скрипящим песком. Тропический парк, первоклассный сервис и близость к ресторанам.'
       }
     ]
   },
   russia: {
     keys: /росси|сочи|красн.*полян|дагест|алтай|карели/,
-    country: "Россия",
-    resort: "Сочи / Красная Поляна",
-    airportCode: "AER",
-    airportName: "Сочи (AER)",
-    flightHours: "3 ч 50 мин",
-    airline: "Аэрофлот / S7 (SU-1124)",
-    airlineReturn: "Аэрофлот (SU-1125)",
+    country: 'Россия',
+    resort: 'Сочи / Красная Поляна',
+    airportCode: 'AER',
+    airportName: 'Сочи (AER)',
+    flightHours: '3 ч 50 мин',
+    airline: 'Аэрофлот / S7 (SU-1124)',
+    airlineReturn: 'Аэрофлот (SU-1125)',
     basePrice: 52000,
-    foodDefault: "Завтраки (Шведский стол)",
+    foodDefault: 'Завтраки (Шведский стол)',
+    photos: PHOTO_BANKS.russia,
     hotels: [
       {
-        name: "Marriott Sochi Krasnaya Polyana",
+        name: 'Marriott Sochi Krasnaya Polyana',
         stars: 5,
-        rating: "4.9",
+        rating: '4.9',
         reviewsCount: 691,
-        resort: "Россия · Красная Поляна",
-        beach: "Горный курорт + трансфер на собственный пляж в Имеретинке",
-        food: "Завтраки (Шведский стол)",
-        room: "Deluxe Mountain View (40 м²)",
+        resort: 'Россия · Красная Поляна',
+        beach: 'Горный курорт + трансфер на собственный пляж в Имеретинке',
+        food: 'Завтраки (Шведский стол)',
+        room: 'Deluxe Mountain View (40 м²)',
         features: [
-          "Открытый подогреваемый бассейн с видом на Кавказские горы",
-          "Роскошный Soul SPA и термальный комплекс",
-          "Канатная дорога в 100 метрах от отеля",
-          "Бесплатный шаттл на морской пляж"
+          'Открытый подогреваемый бассейн с видом на Кавказские горы',
+          'Роскошный Soul SPA и термальный комплекс',
+          'Канатная дорога в 100 метрах от отеля',
+          'Бесплатный шаттл на морской пляж'
         ],
-        photos: [
-          { url: "https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Кавказские горы" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Бассейн с панорамой" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Интерьер отеля" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Спа-комплекс" }
-        ],
-        desc: "Премиальный пятизвездочный отель в сердце курорта Красная Поляна. Открытый круглогодичный подогреваемый бассейн, захватывающий вид на горные вершины."
-      },
-      {
-        name: "Sea Galaxy Hotel Congress & Spa",
-        stars: 4,
-        rating: "4.7",
-        reviewsCount: 480,
-        resort: "Россия · Сочи, Светлана",
-        beach: "1-я линия (100 м до центральной набережной)",
-        food: "Завтраки + Ужины (Шведский стол)",
-        room: "Standard Sea View с балконом (24 м²)",
-        features: [
-          "Панорамный вид на Черное море из всех номеров",
-          "Рядом парк Дендрарий и цирк",
-          "Современный спа-центр и тренажерный зал",
-          "Экскурсия в Олимпийский парк в подарок"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Черноморское побережье" },
-          { url: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Территория отеля" },
-          { url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Номер с видом на море" },
-          { url: "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Ресторан" }
-        ],
-        desc: "Популярный отель в центре Сочи в парковой зоне микрорайона Светлана. 100 метров до моря, отличные завтраки и прекрасный сервис."
-      },
-      {
-        name: "Green Flow Hotel Rosa Khutor",
-        stars: 4,
-        rating: "4.9",
-        reviewsCount: 750,
-        resort: "Россия · Роза Хутор (высота 1170 м)",
-        beach: "Горный спа-отель с открытым инфинити-бассейном",
-        food: "Завтраки Organic",
-        room: "Premier Panorama Room (33 м²)",
-        features: [
-          "Знаменитый открытый инфинити-бассейн с подогревом (+32°C)",
-          "Концепция хилинг-отдыха и термальная спа-зона",
-          "Занятия йогой и медитации в горах",
-          "Ски-пасс и трансфер включены"
-        ],
-        photos: [
-          { url: "https://images.pexels.com/photos/29038705/pexels-photo-29038705.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Роза Плато 1170" },
-          { url: "https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Инфинити бассейн Green Flow" },
-          { url: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Панорамный номер" },
-          { url: "https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200", label: "Спа-комплекс" }
-        ],
-        desc: "Первый в России отель международной ассоциации Healing Hotels of the World. Знаменитый инфинити-бассейн на высоте 1170 метров и горный воздух."
+        photos: PHOTO_BANKS.russia,
+        desc: 'Премиальный пятизвездочный отель в сердце курорта Красная Поляна. Открытый круглогодичный подогреваемый бассейн, захватывающий вид на горные вершины.'
       }
     ]
   }
 };
 
+// Robust Parser to convert Groq text into rich TourProposal objects
+function parseAndEnrichGroqText(rawText, userQuery) {
+  const lowerQuery = (userQuery + ' ' + rawText).toLowerCase();
+
+  // Find matching destination or default to Goa/Turkey
+  let destKey = Object.keys(DESTINATIONS_DB).find(k => DESTINATIONS_DB[k].keys.test(lowerQuery));
+  if (!destKey) {
+    if (/пляж|мор|океан|ноябр|октябр|декабр|зимой|в тепле/.test(lowerQuery)) destKey = 'goa';
+    else if (/роскош|премиум|лакшери|остров/.test(lowerQuery)) destKey = 'maldives';
+    else if (/недорог|эконом|скидк|выгод/.test(lowerQuery)) destKey = 'turkey';
+    else destKey = 'goa';
+  }
+  const dest = DESTINATIONS_DB[destKey];
+
+  // Detect departure city
+  let depCity = 'Москвы';
+  let depCode = 'SVO';
+  if (/из ростов|вылет.*ростов|ростова/.test(lowerQuery)) { depCity = 'Ростова-на-Дону'; depCode = 'ROV'; }
+  else if (/из соч|вылет.*сочи/.test(lowerQuery)) { depCity = 'Сочи'; depCode = 'AER'; }
+  else if (/мин.*вод|минвод/.test(lowerQuery)) { depCity = 'Минеральных Вод'; depCode = 'MRV'; }
+  else if (/питер|санкт-петербург/.test(lowerQuery)) { depCity = 'Санкт-Петербурга'; depCode = 'LED'; }
+
+  // Detect travelers count
+  let adults = 2;
+  const adultsMatch = lowerQuery.match(/(\d+)\s*(?:взрос|чел|турист)/);
+  if (adultsMatch) adults = parseInt(adultsMatch[1]);
+  else if (/один|1\s*чел|на одного/.test(lowerQuery)) adults = 1;
+  else if (/на троих|3\s*чел/.test(lowerQuery)) adults = 3;
+
+  let children = 0;
+  const childMatch = lowerQuery.match(/(\d+)\s*(?:реб|дет)/);
+  if (childMatch) children = parseInt(childMatch[1]);
+  else if (/с ребён|с ребен|с дет/.test(lowerQuery)) children = 1;
+
+  // Split text into option blocks (by "1.", "2.", "3." or paragraphs)
+  const rawBlocks = rawText.split(/(?:^|\s+)(?:\d+[\.\)]\s+)/).filter(b => b.trim().length > 10);
+  const proposals = [];
+
+  if (rawBlocks.length >= 2) {
+    // Parse each block returned by Groq
+    rawBlocks.forEach((block, idx) => {
+      const hotelMatch = block.match(/(?:отель|комплекс)?\s*[«"“]([^»"”]+)[»"”]/i) ||
+                         block.match(/(?:отель|гостиница)\s+([A-Za-zА-Яа-я0-9\s-]+?)(?:,|\.|\s+\d★|\s+\d\s*зв)/i);
+      const hotelName = hotelMatch ? hotelMatch[1].trim() : (dest.hotels[idx % dest.hotels.length]?.name || `Курортный отель #${idx+1}`);
+
+      const starsMatch = block.match(/(\d)\s*(?:★|звезд|\*)/i);
+      const stars = starsMatch ? parseInt(starsMatch[1]) : (dest.hotels[idx % dest.hotels.length]?.stars || 4);
+
+      const nightsMatch = block.match(/(\d+)\s*(?:ноч|дн|ночей)/i);
+      const nights = nightsMatch ? parseInt(nightsMatch[1]) : (10 + idx * 2);
+
+      const priceMatch = block.match(/(?:цена|стоимость|от|–|-)?\s*(\d[\d\s]{3,})\s*(?:руб|₽)/i);
+      let price = priceMatch ? parseInt(priceMatch[1].replace(/\s/g, '')) : (225000 + idx * 12000);
+      price = Math.round(price / 500) * 500;
+
+      let food = dest.foodDefault;
+      if (/полупансион|завтрак\s*\+\s*ужин/i.test(block)) food = 'Полупансион (Завтрак + Ужин)';
+      else if (/полный пансион/i.test(block)) food = 'Полный пансион (FB)';
+      else if (/всё включено|all inclusive/i.test(block)) food = 'Всё включено (All Inclusive)';
+      else if (/ультра всё включено/i.test(block)) food = 'Ультра всё включено';
+      else if (/завтрак/i.test(block)) food = 'Завтраки (Шведский стол)';
+
+      const dateMatch = block.match(/вылет[а-я\s]*(\d+\s+[а-яё]+)/i);
+      const depDate = dateMatch ? dateMatch[1] : `0${5 + idx * 2} ноября`;
+
+      const perkMatch = block.match(/(?:преимущество|фишка|плюс|бонус)\s*[:–-]\s*([^.]+)/i);
+      const perk = perkMatch ? perkMatch[1].trim() : (dest.hotels[idx % dest.hotels.length]?.features[0] || 'Бесплатный трансфер и экскурсионный пакет');
+
+      const oldPrice = Math.round((price * 1.12) / 500) * 500;
+      const perPerson = Math.round(price / (adults + children));
+      const tourId = `tour-prop-${hotelName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString().slice(-4)}`;
+
+      const photoSet = dest.photos || PHOTO_BANKS.goa;
+
+      const tourObj = {
+        id: tourId,
+        hotelName: hotelName,
+        stars: stars,
+        rating: (4.7 + idx * 0.1).toFixed(1),
+        reviewsCount: 386 + idx * 55,
+        country: dest.country,
+        resort: dest.hotels[idx % dest.hotels.length]?.resort || `${dest.country}, ${dest.resort}`,
+        beach: dest.hotels[idx % dest.hotels.length]?.beach || '1-я линия, песчаный пляж',
+        food: food,
+        room: 'Deluxe Room (38 м²)',
+        departureCity: depCity,
+        departureAirport: depCode,
+        destinationAirport: dest.airportCode,
+        destinationAirportName: dest.airportName,
+        datesText: `${nights} ночей · вылет ${depDate} 2026`,
+        datesShort: `${depDate} (на ${nights} ночей)`,
+        nights: nights,
+        airline: dest.airline,
+        airlineReturn: dest.airlineReturn,
+        flightHours: dest.flightHours,
+        priceTotal: price.toLocaleString('ru-RU') + ' ₽',
+        priceOld: oldPrice.toLocaleString('ru-RU') + ' ₽',
+        pricePerPerson: perPerson.toLocaleString('ru-RU') + ' ₽ / чел.',
+        discount: '-12%',
+        features: [
+          perk,
+          'Прямой чартерный перелёт с багажом 20 кг',
+          'Трансфер аэропорт — отель на минивэне',
+          'Медицинская страховка туриста с покрытием $40 000'
+        ],
+        photos: photoSet,
+        description: dest.hotels[idx % dest.hotels.length]?.desc || `Прекрасный отель ${hotelName} ${stars}★ на побережье. Идеально подходит для комфортного отдыха у моря.`,
+        adults: adults,
+        children: children,
+        publicLink: `https://reklamadomodedovo-star.github.io/turyrostova-prototype/?tour=${tourId}`
+      };
+
+      window.toursRegistry[tourId] = tourObj;
+      proposals.push(tourObj);
+    });
+  } else {
+    // Fallback if raw text didn't contain 2+ numbered blocks
+    return generateSmartTourProposal(userQuery || rawText);
+  }
+
+  return {
+    destName: `${dest.country} (${dest.resort})`,
+    departureCity: depCity,
+    dates: proposals[0]?.datesShort || 'в ноябре',
+    travelersText: `${adults} взр.${children ? ' + ' + children + ' реб.' : ''}`,
+    proposals: proposals
+  };
+}
+
 // Universal Smart Tour Proposal Generator
 function generateSmartTourProposal(queryText) {
   const lower = queryText.toLowerCase();
 
-  // Find matching destination or pick Goa/Turkey as smart default
   let destKey = Object.keys(DESTINATIONS_DB).find(k => DESTINATIONS_DB[k].keys.test(lower));
   if (!destKey) {
     if (/пляж|мор|океан|ноябр|октябр|декабр|зимой|в тепле/.test(lower)) destKey = 'goa';
@@ -697,24 +577,13 @@ function generateSmartTourProposal(queryText) {
 
   const dest = DESTINATIONS_DB[destKey];
 
-  // Detect departure city
   let departureCity = 'Москвы';
   let depCode = 'SVO';
-  if (/из ростов|вылет.*ростов|ростова/.test(lower)) {
-    departureCity = 'Ростова-на-Дону';
-    depCode = 'ROV';
-  } else if (/из соч|вылет.*сочи/.test(lower)) {
-    departureCity = 'Сочи';
-    depCode = 'AER';
-  } else if (/мин.*вод|минвод/.test(lower)) {
-    departureCity = 'Минеральных Вод';
-    depCode = 'MRV';
-  } else if (/питер|санкт-петербург/.test(lower)) {
-    departureCity = 'Санкт-Петербурга';
-    depCode = 'LED';
-  }
+  if (/из ростов|вылет.*ростов|ростова/.test(lower)) { departureCity = 'Ростова-на-Дону'; depCode = 'ROV'; }
+  else if (/из соч|вылет.*сочи/.test(lower)) { departureCity = 'Сочи'; depCode = 'AER'; }
+  else if (/мин.*вод|минвод/.test(lower)) { departureCity = 'Минеральных Вод'; depCode = 'MRV'; }
+  else if (/питер|санкт-петербург/.test(lower)) { departureCity = 'Санкт-Петербурга'; depCode = 'LED'; }
 
-  // Detect travelers count
   let adults = 2;
   const adultsMatch = lower.match(/(\d+)\s*(?:взрос|чел|турист)/);
   if (adultsMatch) adults = parseInt(adultsMatch[1]);
@@ -726,8 +595,7 @@ function generateSmartTourProposal(queryText) {
   if (childMatch) children = parseInt(childMatch[1]);
   else if (/с ребён|с ребен|с дет/.test(lower)) children = 1;
 
-  // Detect nights count
-  let nights = 10;
+  let nights = 11;
   const nightsRangeMatch = lower.match(/(\d+)\s*[-–—]\s*(\d+)\s*(?:ноч|дн)/);
   if (nightsRangeMatch) {
     nights = Math.round((parseInt(nightsRangeMatch[1]) + parseInt(nightsRangeMatch[2])) / 2);
@@ -738,31 +606,26 @@ function generateSmartTourProposal(queryText) {
   if (nights < 5) nights = 7;
   if (nights > 21) nights = 14;
 
-  // Detect month
   const months = ['январе', 'феврале', 'марте', 'апреле', 'мае', 'июне', 'июле', 'августе', 'сентябре', 'октябре', 'ноябре', 'декабре'];
   let foundMonth = 'ноябре';
   months.forEach(m => {
     if (lower.includes(m.slice(0, 4))) foundMonth = m;
   });
 
-  // Calculate realistic dates
-  const startDateStr = `05 ${foundMonth.slice(0, 3)} 2026`;
-  const endDateStr = `${5 + nights} ${foundMonth.slice(0, 3)} 2026`;
-
-  // Detect budget
   let budget = 0;
   const budgetMatch = lower.match(/(?:до|бюджет\D{0,10})(\d[\d\s]{3,})/);
   if (budgetMatch) budget = parseInt(budgetMatch[1].replace(/\s/g, ''));
 
-  // Build 2-3 tour options
   const proposals = [];
   const hotelsPool = dest.hotels;
 
   hotelsPool.forEach((hotelTemplate, idx) => {
     const tourId = `tour-prop-${destKey}-${idx + 1}-${Date.now().toString().slice(-4)}`;
+    const depDay = 5 + idx * 2;
+    const startDateStr = `${depDay < 10 ? '0' + depDay : depDay} ${foundMonth.slice(0, 3)} 2026`;
+    const endDateStr = `${depDay + nights} ${foundMonth.slice(0, 3)} 2026`;
 
-    // Price calculation
-    let calculatedPrice = dest.basePrice * (adults + children * 0.65) * (nights / 7) + (idx * 18000);
+    let calculatedPrice = dest.basePrice * (adults + children * 0.65) * (nights / 7) + (idx * 14000);
     if (budget && calculatedPrice > budget) {
       calculatedPrice = budget - (idx * 6000);
     }
@@ -788,7 +651,7 @@ function generateSmartTourProposal(queryText) {
       destinationAirport: dest.airportCode,
       destinationAirportName: dest.airportName,
       datesText: `${nights} ночей · ${startDateStr} — ${endDateStr}`,
-      datesShort: `${startDateStr} — ${endDateStr}`,
+      datesShort: `${startDateStr} (на ${nights} ночей)`,
       nights: nights,
       airline: dest.airline,
       airlineReturn: dest.airlineReturn,
@@ -798,10 +661,11 @@ function generateSmartTourProposal(queryText) {
       pricePerPerson: perPerson.toLocaleString('ru-RU') + ' ₽ / чел.',
       discount: '-12%',
       features: hotelTemplate.features,
-      photos: hotelTemplate.photos,
+      photos: hotelTemplate.photos || dest.photos,
       description: hotelTemplate.desc,
       adults: adults,
-      children: children
+      children: children,
+      publicLink: `https://reklamadomodedovo-star.github.io/turyrostova-prototype/?tour=${tourId}`
     };
 
     window.toursRegistry[tourId] = tourObj;
@@ -817,11 +681,12 @@ function generateSmartTourProposal(queryText) {
   };
 }
 
-// Render Bot Message with Rich Tour Cards
+// Render Bot Message with Rich Tour Proposal Cards & Links
 function renderBotProposalMessage(container, data) {
   const intro = document.createElement('div');
   intro.style.marginBottom = '12px';
-  intro.innerHTML = `Здравствуйте! По вашему запросу я подготовила <b>профессиональную подборку туров</b> в <b>${data.destName}</b> с прямым вылетом из <b>${data.departureCity}</b> (${data.dates}, ${data.travelersText}):`;
+  intro.style.lineHeight = '1.5';
+  intro.innerHTML = `Здравствуйте! По вашему запросу я сформировала <b>профессиональную подборку туров</b> в <b>${data.destName}</b> с прямым вылетом из <b>${data.departureCity}</b> (${data.dates}, ${data.travelersText}):`;
   container.appendChild(intro);
 
   const cardsWrap = document.createElement('div');
@@ -846,7 +711,7 @@ function renderBotProposalMessage(container, data) {
         <div class="tour-card-mini-resort">📍 ${tour.resort}</div>
         
         <div class="tour-card-mini-specs">
-          <div><span>✈</span><span><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(' ')[0]} (багаж 20 кг)</span></div>
+          <div><span>✈</span><span><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(' ')[0]} (багаж 20 кг включён)</span></div>
           <div><span>🗓</span><span><b>${tour.datesText}</b></span></div>
           <div><span>🍽</span><span><b>${tour.food}</b></span></div>
           <div><span>🏖</span><span><b>${tour.beach.split('(')[0]}</b></span></div>
@@ -869,11 +734,15 @@ function renderBotProposalMessage(container, data) {
 
         <div class="tour-card-mini-actions">
           <button class="btn-mini-detail" data-open-tour="${tour.id}">
-            <span>Смотреть отель и рейсы</span> <i>↗</i>
+            <span>Открыть презентацию тура (фото, рейсы)</span> <i>↗</i>
           </button>
           <button class="btn-mini-book" data-book-tour="${tour.id}">
-            <span>Бронь</span>
+            <span>Забронировать</span>
           </button>
+        </div>
+        
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);text-align:center;">
+          🔗 <a href="?tour=${tour.id}" style="color:var(--ink);text-decoration:underline;" data-open-tour="${tour.id}">Ссылка на презентацию отеля</a>
         </div>
       </div>
     `;
@@ -887,12 +756,13 @@ function renderBotProposalMessage(container, data) {
   foot.style.fontSize = '11px';
   foot.style.color = 'var(--muted)';
   foot.style.lineHeight = '1.5';
-  foot.innerHTML = `✓ В стоимость включены: прямые перелёты с багажом 20 кг, групповой трансфер, проживание, питание и медстраховка.<br><i>Цены и наличие мест демонстрационные. Нажмите на тур, чтобы изучить подробности и рейсы.</i>`;
+  foot.innerHTML = `✓ В стоимость включены: прямые перелёты туда-обратно с багажом 20 кг, трансфер на минивэне, проживание, питание и медицинская страховка.<br><i>Нажмите на любую кнопку «Открыть презентацию тура», чтобы изучить фото отеля, расписание рейсов и концепцию питания.</i>`;
   container.appendChild(foot);
 
   // Bind Buttons inside this message
   $$('[data-open-tour]', container).forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const id = btn.getAttribute('data-open-tour');
       openTourDetailModal(id);
     });
@@ -909,7 +779,7 @@ function renderBotProposalMessage(container, data) {
   });
 }
 
-// Append Generic Chat Message
+// Append Chat Message
 const aiHistory = [];
 
 function appendMessage(text, type = 'bot') {
@@ -929,7 +799,7 @@ function appendMessage(text, type = 'bot') {
   return m;
 }
 
-// Groq API Caller with Seamless Intelligent Fallback
+// Groq API Caller with Dynamic Parser & Enricher
 async function groqAiReply(text) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
@@ -942,15 +812,17 @@ async function groqAiReply(text) {
       signal: controller.signal
     });
 
-    if (!response.ok) throw new Error('Groq network/status error');
+    if (!response.ok) throw new Error('Groq network error');
     const data = await response.json();
     if (!data.answer) throw new Error('Empty AI answer');
 
     aiHistory.push({ role: 'user', content: text }, { role: 'assistant', content: data.answer });
-    return { type: 'groq', answer: data.answer };
+    
+    // Parse Groq output into rich structured data
+    const parsedData = parseAndEnrichGroqText(data.answer, text);
+    return { type: 'groq-parsed', data: parsedData };
   } catch (error) {
     console.warn('Groq live fallback triggered:', error);
-    // Intelligent Fallback with rich data
     const smartData = generateSmartTourProposal(text);
     return { type: 'smart', data: smartData };
   } finally {
@@ -971,14 +843,8 @@ async function sendAiMessage(text) {
   const span = $('span', pending);
   span.innerHTML = '';
 
-  if (result.type === 'smart' || !result.answer) {
-    const smartData = result.data || generateSmartTourProposal(text);
-    renderBotProposalMessage(span, smartData);
-  } else {
-    // If Groq answered, check if we can enhance it with smart cards or render formatted text
-    const smartData = generateSmartTourProposal(text);
-    renderBotProposalMessage(span, smartData);
-  }
+  const proposalData = result.data || generateSmartTourProposal(text);
+  renderBotProposalMessage(span, proposalData);
 
   $('small', pending).textContent = now();
   const chatBody = $('#chatBody');
@@ -1013,7 +879,6 @@ function openTourDetailModal(tourIdOrObject) {
   let tour = typeof tourIdOrObject === 'string' ? window.toursRegistry[tourIdOrObject] : tourIdOrObject;
 
   if (!tour) {
-    // Fallback default Goa tour if not found
     const smart = generateSmartTourProposal('Гоа на двоих в ноябре');
     tour = smart.proposals[0];
   }
@@ -1236,8 +1101,8 @@ function openTourDetailModal(tourIdOrObject) {
         <div class="inclusion-card">
           <span class="inclusion-check">✓</span>
           <div class="inclusion-card-text">
-            <b>3 авторские экскурсии</b>
-            <span>Водопад Дудхсагар, Старый Гоа и сад пряностей</span>
+            <b>Авторский экскурсионный пакет</b>
+            <span>Включен в состав туристического предложения</span>
           </div>
         </div>
         <div class="inclusion-card">
@@ -1323,6 +1188,18 @@ function closeTourDetailModal() {
 
 $$('[data-close-tour-modal]').forEach(b => b.addEventListener('click', closeTourDetailModal));
 
+// Check URL param ?tour=... or #tour=... to open modal directly
+function checkUrlTourParam() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tourId = urlParams.get('tour') || (window.location.hash.startsWith('#tour=') ? window.location.hash.replace('#tour=', '') : null);
+  if (tourId) {
+    setTimeout(() => {
+      openTourDetailModal(tourId);
+    }, 400);
+  }
+}
+window.addEventListener('DOMContentLoaded', checkUrlTourParam);
+
 // =========================================================================
 // HOMEPAGE CARDS, SEARCH & LEAD FORMS
 // =========================================================================
@@ -1367,12 +1244,7 @@ const HOMEPAGE_TOURS = [
     pricePerPerson: '84 450 ₽ / чел.',
     discount: '-11%',
     features: ['Аквапарк с 11 горками', '7 ресторанов a la carte', 'Песчаный пляж с пирсом', 'SPA-центр'],
-    photos: [
-      { url: 'https://images.pexels.com/photos/19732855/pexels-photo-19732855.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Пляж в Сиде' },
-      { url: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн' },
-      { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер' },
-      { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Ресторан' }
-    ],
+    photos: PHOTO_BANKS.turkey,
     description: 'Один из лучших отелей Сиде для семейного и романтического отдыха. Обширная территория, аквапарк, великолепная кухня.'
   },
   {
@@ -1401,12 +1273,7 @@ const HOMEPAGE_TOURS = [
     pricePerPerson: '107 250 ₽ / чел.',
     discount: '-10%',
     features: ['Собственный аквапарк', 'Красочный коралловый риф', 'Детский луна-парк', 'Подогреваемые бассейны'],
-    photos: [
-      { url: 'https://images.pexels.com/photos/12913416/pexels-photo-12913416.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Красное море' },
-      { url: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Аквапарк' },
-      { url: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер Family' },
-      { url: 'https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Ресторан' }
-    ],
+    photos: PHOTO_BANKS.egypt,
     description: 'Отель в живописном заливе Макади-Бей. Прекрасный риф, луна-парк и разнообразная детская анимация.'
   },
   {
@@ -1435,12 +1302,7 @@ const HOMEPAGE_TOURS = [
     pricePerPerson: '94 800 ₽ / чел.',
     discount: '-12%',
     features: ['Ультра всё включено в ОАЭ', '8 бассейнов и инфинити', '14 ресторанов и баров', 'Пляжные вечеринки'],
-    photos: [
-      { url: 'https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Побережье ОАЭ' },
-      { url: 'https://images.pexels.com/photos/338504/pexels-photo-338504.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Остров Марджан' },
-      { url: 'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Номер Deluxe' },
-      { url: 'https://images.pexels.com/photos/261169/pexels-photo-261169.jpeg?auto=compress&cs=tinysrgb&w=1200', label: 'Бассейн' }
-    ],
+    photos: PHOTO_BANKS.uae,
     description: 'Престижный курорт в Рас-эль-Хайме с редкой для Эмиратов концепцией Ultra All Inclusive.'
   }
 ];
@@ -1518,13 +1380,15 @@ function closeLead() {
 $$('[data-lead]').forEach(b => b.addEventListener('click', () => openLead(b.dataset.lead)));
 $$('[data-close-modal]').forEach(b => b.addEventListener('click', closeLead));
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeLead();
-    closeAi();
-    closeTourDetailModal();
-  }
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeLead();
+      closeAi();
+      closeTourDetailModal();
+    }
+  });
+}
 
 function successMarkup(subject) {
   const id = 'RET-' + Math.floor(1000 + Math.random() * 8999);
@@ -1560,4 +1424,4 @@ $('#quickForm')?.addEventListener('submit', e => {
   }, 250);
 });
 
-console.log('Ростов-Елена-Тур: AI Pro Tour Proposals Engine initialized.');
+console.log('Ростов-Елена-Тур: AI Pro Tour Proposals Engine v3 initialized.');
