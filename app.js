@@ -683,38 +683,37 @@ function generateSmartTourProposal(queryText) {
 
 // Render Bot Message with Rich Tour Proposal Cards & Links
 function renderBotProposalMessage(container, data) {
-  const intro = document.createElement('div');
-  intro.style.marginBottom = '12px';
-  intro.style.lineHeight = '1.5';
+  const intro = document.createElement("div");
+  intro.className = "bot-intro-text";
   intro.innerHTML = `Здравствуйте! По вашему запросу я сформировала <b>профессиональную подборку туров</b> в <b>${data.destName}</b> с прямым вылетом из <b>${data.departureCity}</b> (${data.dates}, ${data.travelersText}):`;
   container.appendChild(intro);
 
-  const cardsWrap = document.createElement('div');
-  cardsWrap.className = 'tour-proposals-wrap';
+  const cardsWrap = document.createElement("div");
+  cardsWrap.className = "tour-proposals-wrap";
 
   data.proposals.forEach(tour => {
-    const card = document.createElement('article');
-    card.className = 'tour-card-mini';
+    const card = document.createElement("article");
+    card.className = "tour-card-mini";
     card.innerHTML = `
       <div class="tour-card-mini-img">
         <img src="${tour.photos[0].url}" alt="${tour.hotelName}" loading="lazy">
         <div class="tour-card-mini-tags">
-          <span class="mini-badge mini-badge-stars">★ ${tour.stars} ЗВЁЗД</span>
-          <span class="mini-badge mini-badge-hot">${tour.discount} ВЫГОДА</span>
+          <div class="mini-badge mini-badge-stars">★ ${tour.stars} ЗВЁЗД</div>
+          <div class="mini-badge mini-badge-hot">${tour.discount} ВЫГОДА</div>
         </div>
       </div>
       <div class="tour-card-mini-content">
         <div class="tour-card-mini-head">
           <h4 class="tour-card-mini-title">${tour.hotelName} ${tour.stars}★</h4>
-          <div class="tour-card-mini-rating"><i>★</i> <b>${tour.rating}</b></div>
+          <div class="tour-card-mini-rating">★ ${tour.rating}</div>
         </div>
         <div class="tour-card-mini-resort">📍 ${tour.resort}</div>
         
         <div class="tour-card-mini-specs">
-          <div><span>✈</span><span><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(' ')[0]} (багаж 20 кг включён)</span></div>
-          <div><span>🗓</span><span><b>${tour.datesText}</b></span></div>
-          <div><span>🍽</span><span><b>${tour.food}</b></span></div>
-          <div><span>🏖</span><span><b>${tour.beach.split('(')[0]}</b></span></div>
+          <div class="spec-row"><i class="spec-ico">✈</i><div class="spec-txt"><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(" ")[0]} (багаж 20 кг включён)</div></div>
+          <div class="spec-row"><i class="spec-ico">🗓</i><div class="spec-txt"><b>${tour.datesText}</b></div></div>
+          <div class="spec-row"><i class="spec-ico">🍽</i><div class="spec-txt"><b>${tour.food}</b></div></div>
+          <div class="spec-row"><i class="spec-ico">🏖</i><div class="spec-txt"><b>${tour.beach.split("(")[0]}</b></div></div>
         </div>
 
         <div class="tour-card-mini-perk">
@@ -724,25 +723,27 @@ function renderBotProposalMessage(container, data) {
         <div class="tour-card-mini-bottom">
           <div class="mini-price-box">
             <small>Итого за всех туристов</small>
-            <div>
-              <strong>${tour.priceTotal}</strong>
-              <span class="old-price">${tour.priceOld}</span>
+            <div class="price-row">
+              <strong class="main-price">${tour.priceTotal}</strong>
+              <del class="old-price">${tour.priceOld}</del>
             </div>
-            <span class="per-person">${tour.pricePerPerson}</span>
+            <div class="per-person">${tour.pricePerPerson}</div>
           </div>
         </div>
 
         <div class="tour-card-mini-actions">
-          <button class="btn-mini-detail" data-open-tour="${tour.id}">
-            <span>Открыть презентацию тура (фото, рейсы)</span> <i>↗</i>
+          <button type="button" class="btn-mini-detail" data-open-tour="${tour.id}">
+            Подробнее и рейсы <i>↗</i>
           </button>
-          <button class="btn-mini-book" data-book-tour="${tour.id}">
-            <span>Забронировать</span>
+          <button type="button" class="btn-mini-book" data-book-tour="${tour.id}">
+            Забронировать
           </button>
         </div>
-        
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);text-align:center;">
-          🔗 <a href="?tour=${tour.id}" style="color:var(--ink);text-decoration:underline;" data-open-tour="${tour.id}">Ссылка на презентацию отеля</a>
+
+        <div class="tour-card-link-row">
+          <a href="#tour=${tour.id}" class="direct-tour-link" data-open-tour="${tour.id}">
+            🔗 Открыть презентацию отеля и рейсов
+          </a>
         </div>
       </div>
     `;
@@ -751,26 +752,24 @@ function renderBotProposalMessage(container, data) {
 
   container.appendChild(cardsWrap);
 
-  const foot = document.createElement('div');
-  foot.style.marginTop = '12px';
-  foot.style.fontSize = '11px';
-  foot.style.color = 'var(--muted)';
-  foot.style.lineHeight = '1.5';
-  foot.innerHTML = `✓ В стоимость включены: прямые перелёты туда-обратно с багажом 20 кг, трансфер на минивэне, проживание, питание и медицинская страховка.<br><i>Нажмите на любую кнопку «Открыть презентацию тура», чтобы изучить фото отеля, расписание рейсов и концепцию питания.</i>`;
+  const foot = document.createElement("div");
+  foot.className = "bot-foot-note";
+  foot.innerHTML = `✓ В стоимость тура включены: прямые перелёты туда-обратно с багажом 20 кг, групповой трансфер на минивэне, проживание, питание и медицинская страховка.<br><i>Нажмите на кнопку «Подробнее и рейсы», чтобы изучить галерею отеля, расписание перелётов и концепцию питания.</i>`;
   container.appendChild(foot);
 
-  // Bind Buttons inside this message
-  $$('[data-open-tour]', container).forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Bind Buttons
+  $$("[data-open-tour]", container).forEach(btn => {
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
-      const id = btn.getAttribute('data-open-tour');
+      const id = btn.getAttribute("data-open-tour");
       openTourDetailModal(id);
     });
   });
 
-  $$('[data-book-tour]', container).forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-book-tour');
+  $$("[data-book-tour]", container).forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute("data-book-tour");
       const tour = window.toursRegistry[id];
       if (tour) {
         openLead(`Бронирование: ${tour.hotelName} ${tour.stars}★ (${tour.resort}, ${tour.datesShort}, ${tour.priceTotal})`);

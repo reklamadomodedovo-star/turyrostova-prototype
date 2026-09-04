@@ -41,7 +41,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Prata&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=ui-fix-v4">
+  <link rel="stylesheet" href="styles.css?v=ui-clean-v5">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"TravelAgency","name":"Ростов-Елена-Тур","telephone":"+7-863-221-05-21","email":"rostovelenatur@yandex.ru","address":{"@type":"PostalAddress","addressLocality":"Ростов-на-Дону","streetAddress":"ул. Лермонтовская, 125","addressCountry":"RU"},"url":"https://turyrostova.ru/"}
   </script>
@@ -263,7 +263,7 @@
   </div>
 
   <div class="toast" id="toast"><b>Добавлено в избранное</b><span>Тур сохранён для сравнения</span></div>
-  <script src="app.js?v=tour-proposals-v4"></script>
+  <script src="app.js?v=tour-proposals-v5"></script>
 </body>
 </html>
 
@@ -431,6 +431,54 @@
 .tour-card-mini-specs span { color: inherit !important; background: transparent !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
 .mini-price-box .old-price { font-size: 12px !important; text-decoration: line-through !important; color: var(--muted) !important; margin-left: 6px !important; font-weight: 400 !important; background: transparent !important; padding: 0 !important; box-shadow: none !important; }
 .mini-price-box .per-person { font-size: 11px !important; color: var(--muted) !important; margin-top: 2px !important; display: block !important; background: transparent !important; padding: 0 !important; box-shadow: none !important; }
+
+
+/* ===================================================
+   CLEAN & BEAUTIFUL TOUR PROPOSALS UI (NO ARTIFACTS)
+   =================================================== */
+.chat-body .chat-message { display: flex; flex-direction: column; max-width: 96%; margin-bottom: 14px; }
+.chat-body .chat-message.user { margin-left: auto; align-items: flex-end; }
+.chat-body .chat-message .chat-bubble { padding: 14px 18px; border-radius: 18px 18px 18px 4px; background: #ffffff; font-size: 13px; line-height: 1.55; box-shadow: 0 4px 20px rgba(9, 47, 51, 0.06); color: var(--ink); width: 100%; box-sizing: border-box; }
+.chat-body .chat-message.user .chat-bubble { background: var(--ink); color: #ffffff; border-radius: 18px 18px 4px 18px; width: auto; max-width: 85%; }
+.bot-intro-text { font-size: 13px; line-height: 1.5; color: var(--ink); margin-bottom: 14px; }
+.bot-foot-note { font-size: 11px; line-height: 1.5; color: var(--muted); margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.tour-proposals-wrap { display: flex; flex-direction: column; gap: 16px; margin: 12px 0 6px; width: 100%; }
+.tour-card-mini { background: #ffffff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: 0 8px 26px rgba(9, 47, 51, 0.08); transition: transform 0.25s, box-shadow 0.25s; width: 100%; box-sizing: border-box; }
+.tour-card-mini:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(9, 47, 51, 0.13); }
+.tour-card-mini-img { position: relative; height: 155px; background: var(--ink); overflow: hidden; }
+.tour-card-mini-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; display: block; }
+.tour-card-mini:hover .tour-card-mini-img img { transform: scale(1.05); }
+.tour-card-mini-tags { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 2; }
+.mini-badge { padding: 5px 11px; border-radius: 100px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); display: inline-flex; align-items: center; justify-content: center; }
+.mini-badge-stars { background: rgba(9, 47, 51, 0.92); color: #ffd65c; backdrop-filter: blur(8px); }
+.mini-badge-hot { background: var(--coral); color: #ffffff; }
+.tour-card-mini-content { padding: 16px 18px 18px; color: var(--ink); background: #ffffff; }
+.tour-card-mini-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+.tour-card-mini-title { font-size: 16px; font-weight: 800; line-height: 1.25; margin: 0; color: var(--ink); font-family: Manrope, Arial, sans-serif; }
+.tour-card-mini-rating { flex-shrink: 0; background: #eef8f5; color: var(--ink); padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid rgba(43, 182, 115, 0.2); display: flex; align-items: center; gap: 4px; }
+.tour-card-mini-resort { font-size: 11px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+.tour-card-mini-specs { display: flex; flex-direction: column; gap: 7px; font-size: 12px; background: var(--cream); padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--line); }
+.spec-row { display: flex; align-items: flex-start; gap: 8px; line-height: 1.35; }
+.spec-ico { font-style: normal; font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; margin-top: 1px; }
+.spec-txt { color: var(--ink); font-weight: 500; font-size: 12px; }
+.spec-txt b { font-weight: 700; color: var(--ink); }
+.tour-card-mini-perk { font-size: 11px; line-height: 1.4; color: #12573e; background: #eaf8f4; border: 1px solid rgba(43, 182, 115, 0.3); padding: 8px 12px; border-radius: 10px; margin-bottom: 14px; font-weight: 600; }
+.tour-card-mini-bottom { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 12px; border-top: 1px solid var(--line); margin-bottom: 14px; }
+.mini-price-box { display: flex; flex-direction: column; width: 100%; }
+.mini-price-box small { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
+.price-row { display: flex; align-items: baseline; gap: 8px; }
+.main-price { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1; }
+.old-price { font-size: 13px; text-decoration: line-through; color: var(--muted); font-weight: 400; }
+.per-person { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+.tour-card-mini-actions { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
+.btn-mini-detail { background: var(--ink); color: #ffffff !important; border: 0; border-radius: 100px; padding: 12px 16px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s, transform 0.2s, box-shadow 0.2s; font-family: Manrope, Arial, sans-serif; text-align: center; text-decoration: none; box-sizing: border-box; }
+.btn-mini-detail:hover { background: var(--coral); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255, 111, 77, 0.3); }
+.btn-mini-detail i { font-style: normal; font-size: 12px; }
+.btn-mini-book { background: var(--coral); color: #ffffff !important; border: 0; border-radius: 100px; padding: 12px 18px; font-size: 12px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s, box-shadow 0.2s; font-family: Manrope, Arial, sans-serif; text-align: center; box-sizing: border-box; }
+.btn-mini-book:hover { background: #e85532; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255, 111, 77, 0.4); }
+.tour-card-link-row { margin-top: 10px; text-align: center; }
+.direct-tour-link { font-size: 11px; color: var(--ink); text-decoration: underline; font-weight: 600; opacity: 0.85; transition: opacity 0.2s, color 0.2s; }
+.direct-tour-link:hover { opacity: 1; color: var(--coral); }
 
 ````
 
@@ -1122,38 +1170,37 @@ function generateSmartTourProposal(queryText) {
 
 // Render Bot Message with Rich Tour Proposal Cards & Links
 function renderBotProposalMessage(container, data) {
-  const intro = document.createElement('div');
-  intro.style.marginBottom = '12px';
-  intro.style.lineHeight = '1.5';
+  const intro = document.createElement("div");
+  intro.className = "bot-intro-text";
   intro.innerHTML = `Здравствуйте! По вашему запросу я сформировала <b>профессиональную подборку туров</b> в <b>${data.destName}</b> с прямым вылетом из <b>${data.departureCity}</b> (${data.dates}, ${data.travelersText}):`;
   container.appendChild(intro);
 
-  const cardsWrap = document.createElement('div');
-  cardsWrap.className = 'tour-proposals-wrap';
+  const cardsWrap = document.createElement("div");
+  cardsWrap.className = "tour-proposals-wrap";
 
   data.proposals.forEach(tour => {
-    const card = document.createElement('article');
-    card.className = 'tour-card-mini';
+    const card = document.createElement("article");
+    card.className = "tour-card-mini";
     card.innerHTML = `
       <div class="tour-card-mini-img">
         <img src="${tour.photos[0].url}" alt="${tour.hotelName}" loading="lazy">
         <div class="tour-card-mini-tags">
-          <span class="mini-badge mini-badge-stars">★ ${tour.stars} ЗВЁЗД</span>
-          <span class="mini-badge mini-badge-hot">${tour.discount} ВЫГОДА</span>
+          <div class="mini-badge mini-badge-stars">★ ${tour.stars} ЗВЁЗД</div>
+          <div class="mini-badge mini-badge-hot">${tour.discount} ВЫГОДА</div>
         </div>
       </div>
       <div class="tour-card-mini-content">
         <div class="tour-card-mini-head">
           <h4 class="tour-card-mini-title">${tour.hotelName} ${tour.stars}★</h4>
-          <div class="tour-card-mini-rating"><i>★</i> <b>${tour.rating}</b></div>
+          <div class="tour-card-mini-rating">★ ${tour.rating}</div>
         </div>
         <div class="tour-card-mini-resort">📍 ${tour.resort}</div>
         
         <div class="tour-card-mini-specs">
-          <div><span>✈</span><span><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(' ')[0]} (багаж 20 кг включён)</span></div>
-          <div><span>🗓</span><span><b>${tour.datesText}</b></span></div>
-          <div><span>🍽</span><span><b>${tour.food}</b></span></div>
-          <div><span>🏖</span><span><b>${tour.beach.split('(')[0]}</b></span></div>
+          <div class="spec-row"><i class="spec-ico">✈</i><div class="spec-txt"><b>${tour.departureAirport} ⇄ ${tour.destinationAirport}</b> · ${tour.airline.split(" ")[0]} (багаж 20 кг включён)</div></div>
+          <div class="spec-row"><i class="spec-ico">🗓</i><div class="spec-txt"><b>${tour.datesText}</b></div></div>
+          <div class="spec-row"><i class="spec-ico">🍽</i><div class="spec-txt"><b>${tour.food}</b></div></div>
+          <div class="spec-row"><i class="spec-ico">🏖</i><div class="spec-txt"><b>${tour.beach.split("(")[0]}</b></div></div>
         </div>
 
         <div class="tour-card-mini-perk">
@@ -1163,25 +1210,27 @@ function renderBotProposalMessage(container, data) {
         <div class="tour-card-mini-bottom">
           <div class="mini-price-box">
             <small>Итого за всех туристов</small>
-            <div>
-              <strong>${tour.priceTotal}</strong>
-              <span class="old-price">${tour.priceOld}</span>
+            <div class="price-row">
+              <strong class="main-price">${tour.priceTotal}</strong>
+              <del class="old-price">${tour.priceOld}</del>
             </div>
-            <span class="per-person">${tour.pricePerPerson}</span>
+            <div class="per-person">${tour.pricePerPerson}</div>
           </div>
         </div>
 
         <div class="tour-card-mini-actions">
-          <button class="btn-mini-detail" data-open-tour="${tour.id}">
-            <span>Открыть презентацию тура (фото, рейсы)</span> <i>↗</i>
+          <button type="button" class="btn-mini-detail" data-open-tour="${tour.id}">
+            Подробнее и рейсы <i>↗</i>
           </button>
-          <button class="btn-mini-book" data-book-tour="${tour.id}">
-            <span>Забронировать</span>
+          <button type="button" class="btn-mini-book" data-book-tour="${tour.id}">
+            Забронировать
           </button>
         </div>
-        
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);text-align:center;">
-          🔗 <a href="?tour=${tour.id}" style="color:var(--ink);text-decoration:underline;" data-open-tour="${tour.id}">Ссылка на презентацию отеля</a>
+
+        <div class="tour-card-link-row">
+          <a href="#tour=${tour.id}" class="direct-tour-link" data-open-tour="${tour.id}">
+            🔗 Открыть презентацию отеля и рейсов
+          </a>
         </div>
       </div>
     `;
@@ -1190,26 +1239,24 @@ function renderBotProposalMessage(container, data) {
 
   container.appendChild(cardsWrap);
 
-  const foot = document.createElement('div');
-  foot.style.marginTop = '12px';
-  foot.style.fontSize = '11px';
-  foot.style.color = 'var(--muted)';
-  foot.style.lineHeight = '1.5';
-  foot.innerHTML = `✓ В стоимость включены: прямые перелёты туда-обратно с багажом 20 кг, трансфер на минивэне, проживание, питание и медицинская страховка.<br><i>Нажмите на любую кнопку «Открыть презентацию тура», чтобы изучить фото отеля, расписание рейсов и концепцию питания.</i>`;
+  const foot = document.createElement("div");
+  foot.className = "bot-foot-note";
+  foot.innerHTML = `✓ В стоимость тура включены: прямые перелёты туда-обратно с багажом 20 кг, групповой трансфер на минивэне, проживание, питание и медицинская страховка.<br><i>Нажмите на кнопку «Подробнее и рейсы», чтобы изучить галерею отеля, расписание перелётов и концепцию питания.</i>`;
   container.appendChild(foot);
 
-  // Bind Buttons inside this message
-  $$('[data-open-tour]', container).forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Bind Buttons
+  $$("[data-open-tour]", container).forEach(btn => {
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
-      const id = btn.getAttribute('data-open-tour');
+      const id = btn.getAttribute("data-open-tour");
       openTourDetailModal(id);
     });
   });
 
-  $$('[data-book-tour]', container).forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-book-tour');
+  $$("[data-book-tour]", container).forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute("data-book-tour");
       const tour = window.toursRegistry[id];
       if (tour) {
         openLead(`Бронирование: ${tour.hotelName} ${tour.stars}★ (${tour.resort}, ${tour.datesShort}, ${tour.priceTotal})`);
